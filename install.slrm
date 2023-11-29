@@ -1,0 +1,37 @@
+#!/usr/bin/zsh
+
+### Task name
+#SBATCH --account=thes1447
+#SBATCH --job-name=Install
+
+### Output file
+#SBATCH --output=Install.%J.out
+
+### Maximum runtime
+#SBATCH --time=05:00:00
+
+### Ask for less than 4 GB memory per (CPU) task = MPI rank
+#SBATCH --mem-per-cpu=1000M
+
+### Start a parallel job for a distributed-memory system on several nodes
+#SBATCH --nodes=1
+
+### For MPI, use one task per CPU
+#SBATCH --cpus-per-task=1
+
+### Number of processes per node (the possible maximum depends on your nodes)
+#SBATCH --ntasks-per-node=10
+
+### Mail notification configuration
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=nicklas.bielfeldt@rwth-aachen.de
+
+module purge
+module load GCC/11.3.0
+module load OpenMPI/4.1.4
+module load GCCcore/.11.3.0
+module load Python/3.10.4
+module load CMake/3.24.3
+module load matplotlib/3.5.2
+
+./Install.sh
