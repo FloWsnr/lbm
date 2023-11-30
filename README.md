@@ -3,18 +3,19 @@
 Wetting of GDEs and other porous media using the Lattice Boltzmann method.
 For the LB method, we use the [Palabos](https://gitlab.com/unigespc/palabos) library.
 
-Additionally, we use this [Python code by Javier E. Santos](https://github.com/je-santos/MPLBM-UT) to run the simulations.
-Since the code is constantly being updated, it is advisable to download the latest version
-and apply the changes described below.
-
+Additionally, we use [MPLBM-UT by Javier E. Santos](https://github.com/je-santos/MPLBM-UT) to run the simulations.
+Palabos and MPLBM-UT are included as submodules in this repository.
 
 ## Installation
 
-Download the latest version of MPLBM-UT on the RWTH-Cluster by using
+Clone the repository using
 
 ```
-git clone https://github.com/je-santos/MPLBM-UT.git
+git clone git@git.rwth-aachen.de:avt.cvt/private/fluid_dynamics_models/lattice-boltzmann-wetting.git --recurse-submodules
 ```
+
+
+## Adjustments
 
 _The storage capacity on $WORK (250G) is not limited, but obtaining more space there is significantly more challenging and limited. More space available on $HPCWORK (1000G).
 On the other hand, $HOME (150G) is reserved only for **truly** valuable data, which means any data that cannot be reproduced within a couple of weeks.
@@ -43,7 +44,7 @@ change to
 45 #rock = rock/3  # For proper erase regions and edist, not needed any more
 46 #rock = erase_regions(rock)
 ```
-
+ 
 Now, navigate to **/pore_utils.py**
 
 ```
