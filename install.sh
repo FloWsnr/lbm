@@ -14,10 +14,3 @@ make -j 2
 cd ../../1-phase_LBM/build
 cmake ..
 make -j 2
-
-# cd ../../../
-# conda create -n mplbm python=3.10
-# conda activate mplbm
-# python -m pip install --upgrade pip
-# python -m pip install --upgrade setuptools
-# pip install ./MPLBM-UT/python/
