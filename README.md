@@ -14,6 +14,15 @@ Clone the repository using
 git clone git@git.rwth-aachen.de:avt.cvt/private/fluid_dynamics_models/lattice-boltzmann-wetting.git --recurse-submodules
 ```
 
+To use the python code, you need to create a python virtual environment.
+Download miniconda and install it.
+
+Create a new environment using
+
+```
+conda create -n <env_name> python=3.10
+```
+
 
 ## Adjustments
 
@@ -44,7 +53,7 @@ change to
 45 #rock = rock/3  # For proper erase regions and edist, not needed any more
 46 #rock = erase_regions(rock)
 ```
- 
+
 Now, navigate to **/pore_utils.py**
 
 ```
