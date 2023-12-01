@@ -11,7 +11,13 @@ Palabos and MPLBM-UT are included as submodules in this repository.
 Clone the repository using
 
 ```
-git clone git@git.rwth-aachen.de:avt.cvt/private/fluid_dynamics_models/lattice-boltzmann-wetting.git --recurse-submodules
+git clone git@git.rwth-aachen.de:avt.cvt/private/fluid_dynamics_models/lattice-boltzmann-method/lattice-boltzmann-wetting.git --recurse-submodules
+```
+
+Compile the Palabos library using the install.sh script in the root directory of the repository.
+
+```
+bash install.sh
 ```
 
 To use the python code, you need to create a python virtual environment.
@@ -20,72 +26,35 @@ Download miniconda and install it.
 Create a new environment using
 
 ```
-conda create -n <env_name> python=3.10
+conda create -n lbm
+conda activate lbm
+pip install -e mplbm-ut-mirror/src/python
 ```
 
 
-## Adjustments
+## Notes
 
-_The storage capacity on $WORK (250G) is not limited, but obtaining more space there is significantly more challenging and limited. More space available on $HPCWORK (1000G).
-On the other hand, $HOME (150G) is reserved only for **truly** valuable data, which means any data that cannot be reproduced within a couple of weeks.
-This is due to its higher cost compared to other storage options._
+Palabos and MPLBM-UT work with a different material encoding than most porous media simulations.
+The materials 1,4,6 and 7 can be used for the solid phase, the pore space (wetting fluid, e.g. air) is represented by 0.
+Material 2 is reserved for the internal solid material and material 3 for the non-wetting fluid.
+Material 5 is used for the neutral-wet mesh, which is not used in this simulation.
 
-Navigate to **/src/python/mplbm_utils** and make changes to **create_geom_for_palabos.py**
+Similarly, the contact angles of these materials are given by the adhesion parameters:
 
-```
-21 # read-in file
-22 rock = np.fromfile(geom_file, dtype=data_type).reshape([Nx, Ny, Nz])
+| Material | Adhesion parameter |
+|----------|--------------------|
+| 1        | G_ads_f1_s1        |
+| 4        | G_ads_f1_s2        |
+| 6        | G_ads_f1_s3        |
+| 7        | G_ads_f1_s4        |
 
-(...)
+The adhesion parameters are given in lattice Boltzmann units, which are related to the surface tension $\sigma$ and the contact angle $\Theta$ by
 
-45 rock = rock/3  # For proper erase regions and edist
-46 rock = erase_regions(rock)
-```
+$G_{ads} = \frac{2\cdot \sigma }{r}\cdot cos(\Theta )$
 
-change to
+where $r$ is the radius of the pore space.
 
-```
-21 # read-in file
-22 rock = np.load(geom_file) # to read-in NumPy array
 
-(...)
-
-45 #rock = rock/3  # For proper erase regions and edist, not needed any more
-46 #rock = erase_regions(rock)
-```
-
-Now, navigate to **/pore_utils.py**
-
-```
-33 # Get the final matrix [0,1,2]
-34 erock[(erock>0)*(erock<2)] = 1
-35 erock[erock>1] = 2
-
-(...)
-
-55 erock[nw_fluid_mask == 3] = 2611  # add nw fluid back in if needed
-56 erock = erock.astype(np.int16)
-```
-
-change to
-
-```
-33 # Get the final matrix [0,1,2]
-34 erock[(erock>0)*(erock<2)] = 1
-35 erock[erock>1] = 2
-36 erock[erock == 1] = rock[erock == 1] # to maintain 1 and 4 as the surface
-
-(...)
-
-55 erock[nw_fluid_mask == 3] = 2611  # add nw fluid back in if needed
-56 erock[erock == 4] = 2612 # add second surface
-57 erock = erock.astype(np.int16)
-```
-
-_These changes allow the use of 3D NumPy arrays for the structure as previously only RAW files were supported.
-The surfaces are represented by voxels numbered 1 and 4, and 0 referring to the empty pore space (see Tab. below).
-For structures already created with **porouspy** by [Florian Wiesner](git@git.rwth-aachen.de:avt.cvt/private/fluid_dynamics_models/porouspy.git)
-(i.e. 255 carbon fiber and 200 PTFE) use **NumPy_convert.py** to convert the voxel labels._
 
 To install MPLBM-UT, first load the following modules using
 
@@ -106,7 +75,7 @@ followed by
 
 _Since changes to the RWTH cluster occur frequently, the commands **module unload, list, spider, save** and **restore** may be useful.
 In case the installation is not sucsefull, try logging in to the FastX3 visual interface and check the **Run file as program** box.
-Note that **after installation** the python code can then be further customized under **/<username>/.local/lib/python3.10/site-packages/mplbm_utils**._
+
 
 ## Simulation
 
@@ -186,6 +155,22 @@ module load matplotlib/3.5.2
 python3 2_phase_sim.py
 ```
 
+## Results
+
+When the simulation is running, a **/tmp** folder is created in which the new structure, the .vti files, the capillary pressure
+(lattice Boltzmann unit) and the saturation is stored. The Chan-Shen iterates for each pressure step until the density difference
+reaches the convergence threshold.
+
+## Hints
+
+### Storage
+
+The storage capacity on $WORK (250G) is not limited, but obtaining more space there is significantly more challenging and limited. More space available on $HPCWORK (1000G).
+On the other hand, $HOME (150G) is reserved only for **truly** valuable data, which means any data that cannot be reproduced within a couple of weeks.
+This is due to its higher cost compared to other storage options.
+
+### Parallelization
+
 Scalability and efficiency are not necessarily easy to achieve optimally, but in real-life scenarios,
 they can be reduced to some **fundamental questions and rules** in the first approximation.
 
@@ -205,9 +190,3 @@ Observe how increasing the number of cores affects the computation. If the code 
 Initially, try to stay within 1 node (to avoid network overhead) as long as the job runtimes remain acceptable
 (a few days are acceptable; jobs can run up to 7 days, and for longer computations, consider dividing them into parts
 using "restart files" and running them as [chained jobs](https://hpc-wiki.info/hpc/SLURM#Array_and_Chain_Jobs).
-
-## Results
-
-When the simulation is running, a **/tmp** folder is created in which the new structure, the .vti files, the capillary pressure
-(lattice Boltzmann unit) and the saturation is stored. The Chan-Shen iterates for each pressure step until the density difference
-reaches the convergence threshold.
