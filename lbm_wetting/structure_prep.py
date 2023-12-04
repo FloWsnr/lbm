@@ -162,7 +162,7 @@ class PalabosGeometry:
 
         # Maybe structure must be converted to 2608 etc
 
-        path = Path(self.sim_dir / self.input_dir)
+        path = Path(self.sim_dir) / self.input_dir
         path.mkdir(parents=True, exist_ok=True)
 
         self.structure.flatten().tofile(path / f"{self.geom_name}.dat")  # Save geometry

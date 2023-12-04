@@ -15,8 +15,9 @@ def run_2_phase_sim(inputs):
 
     # 1) Create Palabos geometry
     print("Creating efficient geometry for Palabos...")
-    palabos_geom = prep.
-    prep.create_geom_for_palabos(inputs)
+    palabos_geom = prep.PalabosGeometry(inputs)
+    palabos_geom.convert_material_ids()
+    palabos_geom.create_geom_for_palabos()
 
     # 2) Create simulation input file
     print("Creating input file...")
@@ -103,10 +104,11 @@ def process_and_plot_results(inputs):
     return
 
 
-input_file = "/home/fw641779/Coding/lattice-boltzmann-wetting/wetting/input.yml"
-inputs = mplbm.parse_input_file(input_file)  # Parse inputs
-run_2_phase_sim(inputs)  # Run 2 phase sim
-# run_rel_perm_sim(inputs)  # Run rel perm
-# process_and_plot_results(inputs)  # Plot results
+if __name__ == "__main__":
+    input_file = "/work/fw641779/wetting/structures/test/input/input.yml"
+    inputs = mplbm.parse_input_file(input_file)  # Parse inputs
+    run_2_phase_sim(inputs)  # Run 2 phase sim
+    # run_rel_perm_sim(inputs)  # Run rel perm
+    # process_and_plot_results(inputs)  # Plot results
 
-# plt.show()
+    # plt.show()
