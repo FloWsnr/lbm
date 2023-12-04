@@ -1,4 +1,3 @@
-import os
 import subprocess
 import numpy as np
 import matplotlib.pyplot as plt
@@ -16,6 +15,7 @@ def run_2_phase_sim(inputs):
 
     # 1) Create Palabos geometry
     print("Creating efficient geometry for Palabos...")
+    palabos_geom = prep.
     prep.create_geom_for_palabos(inputs)
 
     # 2) Create simulation input file

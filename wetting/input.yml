@@ -7,19 +7,14 @@ input output:
   output folder: "output/"
 
 geometry:
-  file name: "structure.npy" # Name of the input geometry file
-  data type: uint8
-  geometry size:
-    Nx:
-    Ny:
-    Nz:
+  file name: "structure_cropped.npy" # Name of the input geometry file
 
 domain:
   geom name: "structure_converted"  # Name of .dat file, rename from original if you'd like. Do not include the file extension.
   domain size:
-    nx: 280
-    ny: 200
-    nz: 200
+    nx: 50
+    ny: 50
+    nz: 50
   periodic boundary:
     x: False
     y: False
