@@ -1,7 +1,8 @@
 import subprocess
-import mplbm_utils as mplbm
 from pathlib import Path
-import structure_prep as prep
+
+import lbm_wetting.utils.structure_prep as prep
+import lbm_wetting.utils.parse_input_file as parse
 
 
 def run_2_phase_sim(inputs):
@@ -10,8 +11,8 @@ def run_2_phase_sim(inputs):
     # 2) create palabos input file
     # 3) run 2-phase sim
 
-    sim_directory = inputs["input output"]["simulation directory"]
-    input_dir = inputs["input output"]["input folder"]
+    sim_directory = inputs["input_output"]["simulation_directory"]
+    input_dir = inputs["input_output"]["input_folder"]
 
     # 1) Create Palabos geometry
     print("Creating efficient geometry for Palabos...")
@@ -26,7 +27,7 @@ def run_2_phase_sim(inputs):
 
     # 3) Run 2-phase simulation
     print("Running 2-phase simulation...")
-    num_procs = inputs["simulation"]["num procs"]
+    num_procs = inputs["simulation"]["num_procs"]
 
     input_folder = Path(sim_directory) / input_dir
     input_file = input_folder / "2_phase_sim_input.xml"
@@ -43,8 +44,11 @@ def run_2_phase_sim(inputs):
 
 
 if __name__ == "__main__":
-    input_file = "/work/fw641779/wetting/structures/test/input/input.yml"
-    inputs = mplbm.parse_input_file(input_file)  # Parse inputs
+    input_file = Path(
+        "/work/fw641779/wetting/structures/test/input/input_2phase_steps.yml"
+    )
+    parser = parse.InputFileParser(input_file)
+    inputs = parser.parse()
     run_2_phase_sim(inputs)  # Run 2 phase sim
     # run_rel_perm_sim(inputs)  # Run rel perm
     # process_and_plot_results(inputs)  # Plot results

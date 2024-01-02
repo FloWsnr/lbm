@@ -29,6 +29,7 @@ Create a new environment using
 conda create -n lbm
 conda activate lbm
 conda install ipykernel
+conda install pydantic -c conda-forge
 pip install -e mplbm-ut-mirror/src/python
 
 ```

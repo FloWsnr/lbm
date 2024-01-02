@@ -6,13 +6,13 @@ import scipy.ndimage.morphology
 
 class PalabosGeometry:
     def __init__(self, inputs: dict):
-        self.sim_dir = inputs["input output"]["simulation directory"]
-        self.input_dir = inputs["input output"]["input folder"]
+        self.sim_dir = inputs["input_output"]["simulation_directory"]
+        self.input_dir = inputs["input_output"]["input_folder"]
 
-        self.geom_file_name = inputs["geometry"]["file name"]
+        self.geom_file_name = inputs["geometry"]["file_name"]
         self.geom_file = Path(self.sim_dir) / self.input_dir / self.geom_file_name
-        self.geom_name = inputs["domain"]["geom name"]
-        self.inout_layers = inputs["domain"]["inlet and outlet layers"]
+        self.geom_name = inputs["domain"]["geom_name"]
+        self.inout_layers = inputs["domain"]["inlet_outlet_layers"]
 
         # read-in file
         self.structure: np.ndarray = np.load(self.geom_file)
@@ -180,33 +180,33 @@ class PalabosInputFile:
     def __init__(self, inputs):
         self.inputs = inputs
 
-        sim_dir = inputs["input output"]["simulation directory"]
-        input_dir = inputs["input output"]["input folder"]
-        output_folder = inputs["input output"]["output folder"]
+        sim_dir = inputs["input_output"]["simulation_directory"]
+        input_dir = inputs["input_output"]["input_folder"]
+        output_folder = inputs["input_output"]["output_folder"]
 
         self.output_dir = Path(sim_dir) / output_folder
 
         self.file = Path(sim_dir) / input_dir / "2_phase_sim_input.xml"
 
-        restart_sim = inputs["simulation"]["restart sim"]
+        restart_sim = inputs["simulation"]["restart_sim"]
         with open(self.file, "w") as file:
             file.write('<?xml version="1.0"?>\n\n')
             file.write(f"<load_savedstated> {restart_sim} </load_savedstated>\n\n")
 
     def _write_geometry_section(self):
         # Get geometry inputs
-        periodic_x = self.inputs["domain"]["periodic boundary"]["x"]
-        periodic_y = self.inputs["domain"]["periodic boundary"]["y"]
-        periodic_z = self.inputs["domain"]["periodic boundary"]["z"]
+        periodic_x = self.inputs["domain"]["periodic_boundary"]["x"]
+        periodic_y = self.inputs["domain"]["periodic_boundary"]["y"]
+        periodic_z = self.inputs["domain"]["periodic_boundary"]["z"]
 
-        nx = self.inputs["domain"]["domain size"]["nx"]
-        ny = self.inputs["domain"]["domain size"]["ny"]
-        nz = self.inputs["domain"]["domain size"]["nz"]
-        num_layers = self.inputs["domain"]["inlet and outlet layers"]
+        nx = self.inputs["domain"]["domain_size"]["nx"]
+        ny = self.inputs["domain"]["domain_size"]["ny"]
+        nz = self.inputs["domain"]["domain_size"]["nz"]
+        num_layers = self.inputs["domain"]["inlet_outlet_layers"]
         domain_size = [nx + (2 * num_layers), ny, nz]
 
-        geo_file_name = self.inputs["domain"]["geom name"]
-        geo_file = self.file.parent / f"{geo_file_name}.dat"
+        geo_file_name = self.inputs["domain"]["geom_name"]
+        geo_file = self.file.parent / f"{geo_file_name}"
 
         with open(self.file, "a") as file:
             # Write geometry section
@@ -235,18 +235,18 @@ class PalabosInputFile:
         else:
             load_fluid_from_geom = False
 
-        fluid1_x1 = self.inputs["simulation"]["fluid 1 init"]["x1"]
-        fluid1_x2 = self.inputs["simulation"]["fluid 1 init"]["x2"]
-        fluid1_y1 = self.inputs["simulation"]["fluid 1 init"]["y1"]
-        fluid1_y2 = self.inputs["simulation"]["fluid 1 init"]["y2"]
-        fluid1_z1 = self.inputs["simulation"]["fluid 1 init"]["z1"]
-        fluid1_z2 = self.inputs["simulation"]["fluid 1 init"]["z2"]
-        fluid2_x1 = self.inputs["simulation"]["fluid 2 init"]["x1"]
-        fluid2_x2 = self.inputs["simulation"]["fluid 2 init"]["x2"]
-        fluid2_y1 = self.inputs["simulation"]["fluid 2 init"]["y1"]
-        fluid2_y2 = self.inputs["simulation"]["fluid 2 init"]["y2"]
-        fluid2_z1 = self.inputs["simulation"]["fluid 2 init"]["z1"]
-        fluid2_z2 = self.inputs["simulation"]["fluid 2 init"]["z2"]
+        fluid1_x1 = self.inputs["simulation"]["fluid_1_init"]["x1"]
+        fluid1_x2 = self.inputs["simulation"]["fluid_1_init"]["x2"]
+        fluid1_y1 = self.inputs["simulation"]["fluid_1_init"]["y1"]
+        fluid1_y2 = self.inputs["simulation"]["fluid_1_init"]["y2"]
+        fluid1_z1 = self.inputs["simulation"]["fluid_1_init"]["z1"]
+        fluid1_z2 = self.inputs["simulation"]["fluid_1_init"]["z2"]
+        fluid2_x1 = self.inputs["simulation"]["fluid_2_init"]["x1"]
+        fluid2_x2 = self.inputs["simulation"]["fluid_2_init"]["x2"]
+        fluid2_y1 = self.inputs["simulation"]["fluid_2_init"]["y1"]
+        fluid2_y2 = self.inputs["simulation"]["fluid_2_init"]["y2"]
+        fluid2_z1 = self.inputs["simulation"]["fluid_2_init"]["z1"]
+        fluid2_z2 = self.inputs["simulation"]["fluid_2_init"]["z2"]
 
         with open(self.file, "a") as file:
             # Write initial position of fluids
@@ -279,18 +279,18 @@ class PalabosInputFile:
         force_f1 = self.inputs["simulation"]["force_f1"]
         force_f2 = self.inputs["simulation"]["force_f2"]
 
-        Gc = self.inputs["simulation"]["fluid data"]["Gc"]
-        omega_f1 = self.inputs["simulation"]["fluid data"]["omega_f1"]
-        omega_f2 = self.inputs["simulation"]["fluid data"]["omega_f2"]
-        G_ads_f1_s1 = self.inputs["simulation"]["fluid data"]["G_ads_f1_s1"]
-        G_ads_f1_s2 = self.inputs["simulation"]["fluid data"]["G_ads_f1_s2"]
-        G_ads_f1_s3 = self.inputs["simulation"]["fluid data"]["G_ads_f1_s3"]
-        G_ads_f1_s4 = self.inputs["simulation"]["fluid data"]["G_ads_f1_s4"]
+        Gc = self.inputs["simulation"]["fluid_data"]["Gc"]
+        omega_f1 = self.inputs["simulation"]["fluid_data"]["omega_f1"]
+        omega_f2 = self.inputs["simulation"]["fluid_data"]["omega_f2"]
+        G_ads_f1_s1 = self.inputs["simulation"]["fluid_data"]["G_ads_f1_s1"]
+        G_ads_f1_s2 = self.inputs["simulation"]["fluid_data"]["G_ads_f1_s2"]
+        G_ads_f1_s3 = self.inputs["simulation"]["fluid_data"]["G_ads_f1_s3"]
+        G_ads_f1_s4 = self.inputs["simulation"]["fluid_data"]["G_ads_f1_s4"]
 
-        pressure_bc = self.inputs["simulation"]["pressure bc"]
+        pressure_bc = self.inputs["simulation"]["pressure_bc"]
         if pressure_bc == True:
-            minimum_radius = self.inputs["simulation"]["minimum radius"]
-            num_pc_steps = self.inputs["simulation"]["num pressure steps"]
+            minimum_radius = self.inputs["simulation"]["minimum_radius"]
+            num_pc_steps = self.inputs["simulation"]["num_pressure_steps"]
         else:
             minimum_radius = 1
             num_pc_steps = 0
@@ -323,15 +323,15 @@ class PalabosInputFile:
 
     def _write_output_section(self):
         convergence = self.inputs["simulation"]["convergence"]
-        convergence_iter = self.inputs["simulation"]["convergence iter"]
-        max_iter = self.inputs["simulation"]["max iterations"]
-        save_sim = self.inputs["simulation"]["save sim"]
-        save_iter = self.inputs["simulation"]["save iter"]
-        gif_iter = self.inputs["simulation"]["gif iter"]
-        vtk_iter = self.inputs["simulation"]["vtk iter"]
+        convergence_iter = self.inputs["simulation"]["convergence_iter"]
+        max_iter = self.inputs["simulation"]["max_iterations"]
+        save_sim = self.inputs["simulation"]["save_sim"]
+        save_iter = self.inputs["simulation"]["save_iter"]
+        gif_iter = self.inputs["simulation"]["gif_iter"]
+        vtk_iter = self.inputs["simulation"]["vtk_iter"]
         rho_f2_vtk = self.inputs["simulation"]["rho_f2_vtk"]
-        print_geom = self.inputs["simulation"]["print geom"]
-        print_stl = self.inputs["simulation"]["print stl"]
+        print_geom = self.inputs["simulation"]["print_geom"]
+        print_stl = self.inputs["simulation"]["print_stl"]
 
         with open(self.file, "a") as file:
             # Write output section
