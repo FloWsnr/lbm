@@ -1,10 +1,11 @@
 from pathlib import Path
+from typing import Optional
 import numpy as np
 import scipy.ndimage.morphology
 
 
 class PalabosGeometry:
-    def __init__(self, inputs):
+    def __init__(self, inputs: dict):
         self.sim_dir = inputs["input output"]["simulation directory"]
         self.input_dir = inputs["input output"]["input folder"]
 
@@ -122,14 +123,20 @@ class PalabosGeometry:
         """
         structure = np.pad(
             structure,
-            [(num_layers, num_layers), (0, 0), (0, 0)],
+            ((num_layers, num_layers), (0, 0), (0, 0)),
             mode="constant",
             constant_values=(0, 0),
         )
         return structure
 
-    def convert_material_ids(self, conversion: dict = None):
-        """Convert the material ids (255, 200 etc) to the correct values for Palabos"""
+    def convert_material_ids(self, conversion: Optional[dict] = None):
+        """Convert the material ids (255, 200 etc) to the correct values for Palabos
+
+        Parameters
+        ----------
+        conversion : dict, optional
+            The conversion dictionary, by default None
+        """
 
         if conversion is None:
             conversion = {
@@ -162,7 +169,7 @@ class PalabosGeometry:
 
         # Maybe structure must be converted to 2608 etc
 
-        path = Path(self.sim_dir) / self.input_dir
+        path: Path = Path(self.sim_dir) / self.input_dir
         path.mkdir(parents=True, exist_ok=True)
 
         self.structure.flatten().tofile(path / f"{self.geom_name}.dat")  # Save geometry
