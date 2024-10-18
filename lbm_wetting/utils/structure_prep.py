@@ -218,14 +218,14 @@ class PalabosInputFile:
                 f"\t<size> <x> {domain_size[0]} </x> <y> {domain_size[1]} </y> <z> {domain_size[2]} </z> </size>\n"
             )
             # Periodicity
-            file.write(f"\t<per>\n")
+            file.write("\t<per>\n")
             file.write(
                 f"\t\t<fluid1> <x> {periodic_x} </x> <y> {periodic_y} </y> <z> {periodic_z} </z> </fluid1>\n"
             )
             file.write(
                 f"\t\t<fluid2> <x> {periodic_x} </x> <y> {periodic_y} </y> <z> {periodic_z} </z> </fluid2>\n"
             )
-            file.write(f"\t</per>\n")
+            file.write("\t</per>\n")
             file.write("</geometry>\n\n")
 
     def _write_fluid_positions(self):
@@ -250,26 +250,26 @@ class PalabosInputFile:
 
         with open(self.file, "a") as file:
             # Write initial position of fluids
-            file.write(f"<init>\n")
+            file.write("<init>\n")
             file.write(
                 f"\t<fluid_from_geom> {load_fluid_from_geom} </fluid_from_geom>\n"
             )
-            file.write(f"\t<fluid1>\n")
+            file.write("\t<fluid1>\n")
             file.write(
                 f"\t\t <x1> {fluid1_x1} </x1> <y1> {fluid1_y1} </y1> <z1> {fluid1_z1} </z1>\n"
             )
             file.write(
                 f"\t\t <x2> {fluid1_x2} </x2> <y2> {fluid1_y2} </y2> <z2> {fluid1_z2} </z2>\n"
             )
-            file.write(f"\t</fluid1>\n")
-            file.write(f"\t<fluid2>\n")
+            file.write("\t</fluid1>\n")
+            file.write("\t<fluid2>\n")
             file.write(
                 f"\t\t <x1> {fluid2_x1} </x1> <y1> {fluid2_y1} </y1> <z1> {fluid2_z1} </z1>\n"
             )
             file.write(
                 f"\t\t <x2> {fluid2_x2} </x2> <y2> {fluid2_y2} </y2> <z2> {fluid2_z2} </z2>\n"
             )
-            file.write(f"\t</fluid2>\n")
+            file.write("\t</fluid2>\n")
             file.write("</init>\n\n")
 
     def _write_fluid_data(self):
@@ -288,7 +288,7 @@ class PalabosInputFile:
         G_ads_f1_s4 = self.inputs["simulation"]["fluid_data"]["G_ads_f1_s4"]
 
         pressure_bc = self.inputs["simulation"]["pressure_bc"]
-        if pressure_bc == True:
+        if pressure_bc:
             minimum_radius = self.inputs["simulation"]["minimum_radius"]
             num_pc_steps = self.inputs["simulation"]["num_pressure_steps"]
         else:
@@ -317,7 +317,7 @@ class PalabosInputFile:
             file.write(f"\t<rho_f2_i> {rho_f2} </rho_f2_i>\n")
             file.write(f"\t<num_pc_steps> {num_pc_steps} </num_pc_steps>\n")
             file.write(f"\t<min_radius> {minimum_radius} </min_radius>\n")
-            file.write(f"\t<rho_d> 0.06 </rho_d>\n")
+            file.write("\t<rho_d> 0.06 </rho_d>\n")
 
             file.write("</fluids>\n\n")
 
