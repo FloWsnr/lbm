@@ -229,7 +229,7 @@ class PalabosInputFile:
             file.write("</geometry>\n\n")
 
     def _write_fluid_positions(self):
-        load_fluid_type = self.inputs["simulation"]["fluid init"]
+        load_fluid_type = self.inputs["simulation"]["fluid_init"]
         if load_fluid_type == "geom":
             load_fluid_from_geom = True
         else:
