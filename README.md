@@ -73,7 +73,8 @@ module load matplotlib/3.5.2
 followed by
 
 ```
-./Install.sh
+chmod +x install.sh
+./install.sh
 ```
 
 _Since changes to the RWTH cluster occur frequently, the commands **module unload, list, spider, save** and **restore** may be useful.
