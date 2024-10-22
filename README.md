@@ -30,8 +30,9 @@ conda create -n lbm
 conda activate lbm
 conda install ipykernel
 conda install pydantic -c conda-forge
-pip install -e mplbm-ut-mirror/src/python
-
+conda install scipy
+conda install pyyaml
+conda install pyvista
 ```
 
 
