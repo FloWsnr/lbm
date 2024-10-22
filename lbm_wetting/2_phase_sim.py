@@ -1,8 +1,20 @@
 import subprocess
 from pathlib import Path
+import yaml
 
 import lbm_wetting.utils.structure_prep as prep
-import lbm_wetting.utils.parse_input_file as parse
+import lbm_wetting.utils.pydantic_schemas as schemas
+from lbm_wetting.utils.palabos_file import PalabosInputFile
+
+class InputFileParser:
+    def __init__(self, file: Path) -> None:
+        self.file = file
+        with open(self.file) as f:
+            self.inputs = yaml.full_load(f)
+
+    def parse(self):
+        self.inputs = schemas.Config(**self.inputs).model_dump()
+        return self.inputs
 
 
 def run_2_phase_sim(inputs):
@@ -47,10 +59,6 @@ if __name__ == "__main__":
     input_file = Path(
         "/work/fw641779/wetting/structures/test/input/input_2phase_steps.yml"
     )
-    parser = parse.InputFileParser(input_file)
+    parser = InputFileParser(input_file)
     inputs = parser.parse()
     run_2_phase_sim(inputs)  # Run 2 phase sim
-    # run_rel_perm_sim(inputs)  # Run rel perm
-    # process_and_plot_results(inputs)  # Plot results
-
-    # plt.show()
