@@ -18,21 +18,14 @@ materials:
   - [128, 3] # This is the non-wetting fluid
 
 domain:
-  domain_size:
-    nx: 50
-    ny: 50
-    nz: 50
   periodic_boundary:
     x: False
-    y: False
-    z: False
+    y: True
+    z: True
   inlet_outlet_layers: 4  # 3-4 recommended for 2-phase sim
   double_geom_resolution: False  # False by default
 
 simulation:
-
-  num_procs: 2
-
   restart_sim: True # Set to true if you would like to continue from a previous saved state
 
   # Fluid densities

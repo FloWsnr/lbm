@@ -1,7 +1,7 @@
-import subprocess
 from pathlib import Path
 import yaml
 import argparse
+
 import lbm_wetting.utils.structure_prep as prep
 from lbm_wetting.utils.palabos_file import PalabosInputFile
 import lbm_wetting.utils.pydantic_schemas as schemas
@@ -33,6 +33,8 @@ def prep_2_phase_sim(config: dict):
     palabos_geom = prep.PalabosGeometry(config)
     palabos_geom.convert_material_ids()
     palabos_geom.create_geom_for_palabos()
+
+    config["structure"] = palabos_geom.structure
 
     # 2) Create simulation input file
     print("Creating input file...")

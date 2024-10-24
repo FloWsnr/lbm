@@ -35,7 +35,6 @@ class PeriodicBoundary(BaseModel):
 
 
 class Domain(BaseModel):
-    domain_size: DomainSize
     periodic_boundary: PeriodicBoundary
     inlet_outlet_layers: int
 
@@ -63,7 +62,6 @@ class FluidData(BaseModel):
 
 
 class Simulation(BaseModel):
-    num_procs: int
     restart_sim: bool
     rho_f1: int
     rho_f2: int
