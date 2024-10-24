@@ -42,7 +42,7 @@ sim_name="test_run"
 conda activate lbm
 python3 /home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/2_phase_sim.py $config_file $sim_dir $sim_name
 return_code=$?
-if [ $return_code -nq 0 ]; then
+if [ $return_code -ne 0 ]; then
     echo "Python script failed with code $return_code. Exiting..."
     return $return_code
 else
