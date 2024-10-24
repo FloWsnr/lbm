@@ -4,14 +4,7 @@ from pathlib import Path
 class PalabosInputFile:
     def __init__(self, inputs):
         self.inputs = inputs
-
-        sim_dir = inputs["input_output"]["simulation_directory"]
-        input_dir = inputs["input_output"]["input_folder"]
-        output_folder = inputs["input_output"]["output_folder"]
-
-        self.output_dir = Path(sim_dir) / output_folder
-
-        self.file = Path(sim_dir) / input_dir / "2_phase_sim_input.xml"
+        self.file = self.inputs["input_output"]["input_folder"] / "2_phase_sim_input.xml"
 
         restart_sim = inputs["simulation"]["restart_sim"]
         with open(self.file, "w") as file:
@@ -30,8 +23,9 @@ class PalabosInputFile:
         num_layers = self.inputs["domain"]["inlet_outlet_layers"]
         domain_size = [nx + (2 * num_layers), ny, nz]
 
-        geo_file_name = self.inputs["domain"]["geom_name"]
-        geo_file = self.file.parent / f"{geo_file_name}"
+        geo_file_name = self.inputs["input_output"]["file_name"]
+        geo_file = self.inputs["input_output"]["input_folder"] / f"{geo_file_name}"
+        geo_file = geo_file.stem
 
         with open(self.file, "a") as file:
             # Write geometry section
@@ -163,7 +157,8 @@ class PalabosInputFile:
             file.write("<output>\n")
 
             # The / after the {dir} is important for the c++ code
-            file.write(f"\t<out_folder> {self.output_dir}/ </out_folder>\n")
+            output_dir = self.inputs["input_output"]["output_folder"]
+            file.write(f"\t<out_folder> {output_dir}/ </out_folder>\n")
 
             file.write(f"\t<save_it> {save_iter} </save_it>\n")
             file.write(f"\t<save_sim> {save_sim} </save_sim>\n")

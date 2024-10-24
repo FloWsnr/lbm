@@ -36,18 +36,28 @@ def read_vti_file(path: Union[Path, str]) -> dict:
 
 class PalabosGeometry:
     def __init__(self, inputs: dict):
-        self.sim_dir = inputs["input_output"]["simulation_directory"]
-        self.input_dir = inputs["input_output"]["input_folder"]
+        sim_dir = inputs["input_output"]["simulation_directory"]
+        sim_dir = Path(sim_dir)
+        structure_file = sim_dir / inputs["input_output"]["file_name"]
+        data = read_vti_file(structure_file)
+        org_structure = data["structure"]
 
-        self.geom_file_name = inputs["geometry"]["file_name"]
-        self.geom_file = Path(self.sim_dir) / self.input_dir / self.geom_file_name
-        self.geom_name = inputs["domain"]["geom_name"]
-        self.inout_layers = inputs["domain"]["inlet_outlet_layers"]
-
-        # read-in file
-        self.structure: np.ndarray = np.load(self.geom_file)
+        # crop the structure
+        self.structure = self._crop_structure(org_structure, inputs["geometry"]["crop"])
         # Tanspose x and z
         self.structure = self.structure.transpose([2, 1, 0])
+
+        self.inout_layers = inputs["domain"]["inlet_outlet_layers"]
+        self.materials = inputs["materials"]
+
+        self.input_dir = inputs["input_output"]["input_folder"]
+        self.output_dir = inputs["input_output"]["output_folder"]
+
+    def _crop_structure(self, structure: np.ndarray, crop: dict) -> np.ndarray:
+        """Crop the structure"""
+        return structure[
+            crop["x1"] : crop["x2"], crop["y1"] : crop["y2"], crop["z1"] : crop["z2"]
+        ]
 
     def _extract_nw_fluid(self, structure: np.ndarray) -> np.ndarray:
         """
@@ -159,7 +169,7 @@ class PalabosGeometry:
         )
         return structure
 
-    def convert_material_ids(self, conversion: Optional[dict] = None):
+    def convert_material_ids(self):
         """Convert the material ids (255, 200 etc) to the correct values for Palabos
 
         Parameters
@@ -168,16 +178,10 @@ class PalabosGeometry:
             The conversion dictionary, by default None
         """
 
-        if conversion is None:
-            conversion = {
-                255: 1,
-                200: 4,
-                150: 6,
-                128: 3,  # This is the non-wetting fluid
-            }
-
-        for key, val in conversion.items():
-            self.structure[self.structure == key] = val
+        for material in self.materials:
+            old_id = material[0]
+            new_id = material[1]
+            self.structure[self.structure == old_id] = new_id
 
     def create_geom_for_palabos(self):
         # Create a mask for the non-wetting fluid
@@ -197,10 +201,10 @@ class PalabosGeometry:
         num_layers = self.inout_layers
         self.structure = self._add_inlet_outlet_layers(self.structure, num_layers)
 
-        # Maybe structure must be converted to 2608 etc
+        self.input_dir.mkdir(parents=True, exist_ok=True)
+        self.output_dir.mkdir(parents=True, exist_ok=True)
 
-        path: Path = Path(self.sim_dir) / self.input_dir
-        path.mkdir(parents=True, exist_ok=True)
-
-        self.structure.flatten().tofile(path / f"{self.geom_name}.dat")  # Save geometry
-        np.save(path / f"{self.geom_name}.npy", self.structure)
+        self.structure.flatten().tofile(
+            self.input_dir / "structure.dat"
+        )  # Save geometry
+        np.save(self.input_dir / "structure.npy", self.structure)
