@@ -1,16 +1,24 @@
-from pydantic import BaseModel, Field
-from typing import Literal, List, Dict
+from pydantic import BaseModel
+from typing import Literal, Tuple, List
 
 
 class InputOutput(BaseModel):
     simulation_directory: str
-    input_folder: str
-    output_folder: str
+    simulation_name: str
+    file_name: str
+
+
+class Crop(BaseModel):
+    x1: int
+    x2: int
+    y1: int
+    y2: int
+    z1: int
+    z2: int
 
 
 class Geometry(BaseModel):
-    file_name: str
-    data_type: Literal["np.uint8"]
+    crop: Crop
 
 
 ##############################
@@ -29,7 +37,6 @@ class PeriodicBoundary(BaseModel):
 
 
 class Domain(BaseModel):
-    geom_name: str
     domain_size: DomainSize
     periodic_boundary: PeriodicBoundary
     inlet_outlet_layers: int
@@ -58,7 +65,6 @@ class FluidData(BaseModel):
 
 
 class Simulation(BaseModel):
-    simulation_type: Literal["1-phase", "2-phase"]
     num_procs: int
     restart_sim: bool
     rho_f1: int
@@ -91,4 +97,5 @@ class Config(BaseModel):
     input_output: InputOutput
     geometry: Geometry
     domain: Domain
+    materials: List[List[int]]
     simulation: Simulation

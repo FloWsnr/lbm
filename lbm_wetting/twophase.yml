@@ -1,32 +1,42 @@
-input output:
+input_output:
   # Full path to simulation directory
-  simulation directory: "/work/fw641779/wetting/structures/test"
-  input folder: "input/"
-  output folder: "output/"
+  simulation_directory: "/hpcwork/fw641779/lbm/Toray-120C/55cov/structure0"
+  simulation_name: "test_run"
+  file_name: "structure.vti" # Name of the input geometry file
 
 geometry:
-  file name: "structure_cropped.npy" # Name of the input geometry file
+  crop:
+    x1: 0
+    x2: -1 # Use -1 for no cropping
+    y1: 0
+    y2: -1 # Use -1 for no cropping
+    z1: 0
+    z2: -1 # Use -1 for no cropping
+
+materials:
+  # [id in the loaded file, id in the palabos input file]
+  - [255, 1]
+  - [200, 4]
+  - [150, 6]
+  - [128, 3] # This is the non-wetting fluid
 
 domain:
-  geom name: "structure_converted"  # Name of .dat file, rename from original if you'd like. Do not include the file extension.
-  domain size:
+  domain_size:
     nx: 50
     ny: 50
     nz: 50
-  periodic boundary:
+  periodic_boundary:
     x: False
     y: False
     z: False
-  inlet and outlet layers: 4  # 3-4 recommended for 2-phase sim
-  add mesh: False  # Add neutral mesh, by default False --> Not yet implemented
-  swap xz: True  # False by default
-  double geom resolution: False  # False by default
+  inlet_outlet_layers: 4  # 3-4 recommended for 2-phase sim
+  double_geom_resolution: False  # False by default
 
 simulation:
 
-  num procs: 48
+  num_procs: 48
 
-  restart sim: True # Set to true if you would like to continue from a previous saved state
+  restart_sim: True # Set to true if you would like to continue from a previous saved state
 
   # Fluid densities
   rho_f1: 2
@@ -37,28 +47,29 @@ simulation:
   force_f2: 0
 
   # For pressure difference boundary conditions
-  pressure bc: True
-  minimum radius: 1  # Correlated to delta rho in docs. This acts as entry pressure, so set 1-3 voxels lower than inscribed sphere radius
-  num pressure steps: 10
+  pressure_bc: True
+  minimum_radius: 1  # Correlated to delta rho in docs. This acts as entry pressure, so set 1-3 voxels lower than inscribed sphere radius
+  num_pressure_steps: 10
 
   # Initial Conditions
-  fluid init: drainage  # If drainage, traditional drainage setup used. If custom, use fluid 1/2 init to do custom fluid setup
-  # fluid 1 init:
-  #   x1: 1
-  #   x2: 2
-  #   y1: 1
-  #   y2: 100
-  #   z1: 1
-  #   z2: 100
-  # fluid 2 init:
-  #   x1: 3
-  #   x2: 100
-  #   y1: 1
-  #   y2: 100
-  #   z1: 1
-  #   z2: 100
+  fluid_init: drainage  # If drainage, traditional drainage setup used. If custom, use fluid 1/2 init to do custom fluid setup
+  # CURRENTLY NOT USED
+  fluid_1_init:
+    x1: 0
+    x2: 0
+    y1: 0
+    y2: 0
+    z1: 0
+    z2: 0
+  fluid_2_init:
+    x1: 0
+    x2: 0
+    y1: 0
+    y2: 0
+    z1: 0
+    z2: 0
 
-  fluid data:
+  fluid_data:
     Gc: 0.9
     omega_f1: 1
     omega_f2: 1
@@ -69,14 +80,12 @@ simulation:
     G_ads_f1_s4: 0
 
   convergence: 1e-4  # Convergence threshold changed from 1e-4
-  convergence iter: 500  # How often to check for convergence
-  max iterations: 500000  # max iterations per Pc step
-  save sim: True  # Save restart files
-  save iter: 10000  # How often to save restart files
-  gif iter: 25000  # How often to save gifs
-  vtk iter: 25000  # How often to save vtk files
+  convergence_iter: 500  # How often to check for convergence
+  max_iterations: 500000  # max iterations per Pc step
+  save_sim: True  # Save restart files
+  save_iter: 10000  # How often to save restart files
+  gif_iter: 25000  # How often to save gifs
+  vtk_iter: 25000  # How often to save vtk files
   rho_f2_vtk: False  # When True, saves rho f1 and f2 vtks. If False, only saves rho f1 vtk
-  print geom: True  # Create vtk of geometry at beginning
-  print stl: False  # Create stl of geometry at beginning
-
-visualization:  # coming soon
+  print_geom: True  # Create vtk of geometry at beginning
+  print_stl: True  # Create stl of geometry at beginning
