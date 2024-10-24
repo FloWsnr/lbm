@@ -1,7 +1,7 @@
 #!/usr/bin/zsh
 
 ### Task name
-#SBATCH --account=7672
+#SBATCH --account=rwth1711
 #SBATCH --job-name=two-phase_lbm
 
 ### Output file
