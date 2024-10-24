@@ -4,7 +4,9 @@ from pathlib import Path
 class PalabosInputFile:
     def __init__(self, inputs):
         self.inputs = inputs
-        self.file = self.inputs["input_output"]["input_folder"] / "2_phase_sim_input.xml"
+        self.file = (
+            self.inputs["input_output"]["input_folder"] / "2_phase_sim_input.xml"
+        )
 
         restart_sim = inputs["simulation"]["restart_sim"]
         with open(self.file, "w") as file:
@@ -24,8 +26,9 @@ class PalabosInputFile:
         domain_size = [nx + (2 * num_layers), ny, nz]
 
         geo_file_name = self.inputs["input_output"]["file_name"]
-        geo_file = self.inputs["input_output"]["input_folder"] / f"{geo_file_name}"
-        geo_file = geo_file.stem
+        # Remove suffix
+        geo_file_name = geo_file_name.split(".")[0]
+        geo_file = self.inputs["input_output"]["input_folder"] / f"{geo_file_name}.dat"
 
         with open(self.file, "a") as file:
             # Write geometry section

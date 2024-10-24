@@ -1,10 +1,8 @@
 from pydantic import BaseModel
-from typing import Literal, Tuple, List
+from typing import Literal, List
 
 
 class InputOutput(BaseModel):
-    simulation_directory: str
-    simulation_name: str
     file_name: str
 
 

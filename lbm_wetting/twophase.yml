@@ -1,7 +1,4 @@
 input_output:
-  # Full path to simulation directory
-  simulation_directory: "/hpcwork/fw641779/lbm/Toray-120C/55cov/structure0"
-  simulation_name: "test_run"
   file_name: "structure.vti" # Name of the input geometry file
 
 geometry:
@@ -34,7 +31,7 @@ domain:
 
 simulation:
 
-  num_procs: 48
+  num_procs: 2
 
   restart_sim: True # Set to true if you would like to continue from a previous saved state
 
