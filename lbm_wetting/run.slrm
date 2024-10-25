@@ -20,7 +20,7 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=florian.wiesner@avt.rwth-aachen.de
 
-### create time series
+### create time series, i.e. 100 jobs one after another. Each runs for 24 hours
 ##SBATCH --array=1-100%1
 
 ### Maximum runtime per task
@@ -37,14 +37,14 @@ palabos_dir="/home/fw641779/Coding/lattice-boltzmann-wetting/mplbm-ut-mirror/src
 
 config_file="/home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/twophase.yml"
 sim_dir="/hpcwork/fw641779/lbm/Test"
-sim_name="test_run_1"
+sim_name="test_run_2"
 
-conda activate lbm
+#conda activate lbm
 python3 /home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/2_phase_sim.py $config_file $sim_dir $sim_name
 return_code=$?
 if [ $return_code -ne 0 ]; then
     echo "Python script failed with code $return_code. Exiting..."
-    return $return_code
+    exit $return_code
 else
     # Else continue
     input_file=$sim_dir/$sim_name/input/2_phase_sim_input.xml
