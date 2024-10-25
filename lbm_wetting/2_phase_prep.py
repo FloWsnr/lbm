@@ -15,10 +15,16 @@ def parse_input_file(file: Path) -> dict:
 
 
 def update_config(config: dict, sim_dir: Path, sim_name: str) -> dict:
+    sim_run_dir = Path(sim_dir) / sim_name
+    if sim_run_dir.exists():
+        print("  Simulation directory already exists. Incrementing sim_name.")
+        sim_name = f"{sim_name}_1"
+
     config["input_output"]["simulation_directory"] = sim_dir
     config["input_output"]["simulation_name"] = sim_name
     config["input_output"]["input_folder"] = Path(sim_dir) / sim_name / "input"
     config["input_output"]["output_folder"] = Path(sim_dir) / sim_name / "output"
+
     return config
 
 
