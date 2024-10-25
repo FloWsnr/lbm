@@ -80,8 +80,8 @@ class PalabosGeometry:
 
         # crop the structure
         self.structure = self._crop_structure(org_structure, inputs["geometry"])
-        # Tanspose x and z
-        self.structure = self.structure.transpose([2, 1, 0])
+        # swap x and z
+        self.structure = np.swapaxes(self.structure, 0, 2)
 
         self.inout_layers = inputs["domain"]["inlet_outlet_layers"]
         self.materials = inputs["materials"]
@@ -265,15 +265,8 @@ class PalabosGeometry:
         self.input_dir.mkdir(parents=True, exist_ok=True)
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
-        # convert to int16
-        # self.structure = self.structure.astype(np.int32)
-        # self.structure[self.structure == 0] = 2608
-        # self.structure[self.structure == 1] = 2609
-        # self.structure[self.structure == 2] = 2610
-
-        flat_structure = self.structure.flatten()
+        flat_structure = self.structure.flatten(order="C")
         np.savetxt(self.input_dir / "structure.dat", flat_structure, fmt="%d")
-        # flat_structure.tofile(self.input_dir / "structure.dat")  # Save geometry
 
         np.save(self.input_dir / "structure.npy", self.structure)
 

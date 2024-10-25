@@ -20,9 +20,9 @@ class PalabosInputFile:
         periodic_z = self.config["domain"]["periodic_boundary"]["z"]
 
         structure = self.config["structure"]
-        nx = structure.shape[0] + 1
-        ny = structure.shape[1] + 1
-        nz = structure.shape[2] + 1
+        nx = structure.shape[0]
+        ny = structure.shape[1]
+        nz = structure.shape[2]
         domain_size = [nx, ny, nz]
 
         geo_file_name = self.config["input_output"]["file_name"]
