@@ -34,6 +34,36 @@ def read_vti_file(path: Union[Path, str]) -> dict:
     return loaded_data
 
 
+class VTIWriter:
+    def __init__(self, directory: Union[Path, str]) -> None:
+        directory = Path(directory)
+        directory.mkdir(parents=True, exist_ok=True)
+        self.directory = directory
+
+        self.vti_file = None
+        self.grid = None
+
+    def write(self, data: dict, file_name: str) -> None:
+        vti_file = self.directory / file_name
+        self.vti_file = vti_file
+        if self.vti_file.exists():
+            raise FileExistsError(f"File {self.vti_file} already exists")
+
+        self.grid = pv.ImageData()
+        for key, value in data.items():
+            self._add_data(value, name=key)
+        self.grid.save(self.vti_file)
+
+    def _add_data(self, data: np.ndarray, name: str = "value") -> None:
+        if data.ndim == 2:
+            data = np.expand_dims(data, axis=2)
+        shape = np.array(data.shape) + 1
+        self.grid.dimensions = shape
+        self.grid.origin = (0, 0, 0)
+        self.grid.spacing = (1, 1, 1)
+        self.grid.cell_data[name] = data.flatten(order="F")
+
+
 class PalabosGeometry:
     def __init__(self, inputs: dict):
         sim_dir = inputs["input_output"]["simulation_directory"]
@@ -64,7 +94,9 @@ class PalabosGeometry:
         crop = geom["crop"]
         if crop:
             return structure[
-                geom["x1"] : geom["x2"], geom["y1"] : geom["y2"], geom["z1"] : geom["z2"]
+                geom["x1"] : geom["x2"],
+                geom["y1"] : geom["y2"],
+                geom["z1"] : geom["z2"],
             ]
         else:
             return structure
@@ -152,6 +184,22 @@ class PalabosGeometry:
 
         return solid
 
+    def _add_boundary_bounces(self, structure: np.ndarray) -> np.ndarray:
+        """Adds boundary bounces to a structure"""
+        solid = self._get_solid(structure)
+
+        structure[0, :, :] = 1
+        structure[:, 0, :] = 1
+        structure[:, :, 0] = 1
+
+        structure[-1, :, :] = 1
+        structure[:, -1, :] = 1
+        structure[:, :, -1] = 1
+
+        structure[~solid] = 0
+
+        return structure
+
     def _add_inlet_outlet_layers(
         self, structure: np.ndarray, num_layers: int
     ) -> np.ndarray:
@@ -207,6 +255,9 @@ class PalabosGeometry:
         # Turn all non-surface voxels into solid phase 2 (inner solid)
         self.structure[np.logical_and(solid, ~surface)] = 2
 
+        # add boundary bounces backs
+        self.structure = self._add_boundary_bounces(self.structure)
+
         # Add inlet and outlet layers
         num_layers = self.inout_layers
         self.structure = self._add_inlet_outlet_layers(self.structure, num_layers)
@@ -214,7 +265,18 @@ class PalabosGeometry:
         self.input_dir.mkdir(parents=True, exist_ok=True)
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
-        self.structure.flatten().tofile(
-            self.input_dir / "structure.dat"
-        )  # Save geometry
+        # convert to int16
+        # self.structure = self.structure.astype(np.int32)
+        # self.structure[self.structure == 0] = 2608
+        # self.structure[self.structure == 1] = 2609
+        # self.structure[self.structure == 2] = 2610
+
+        flat_structure = self.structure.flatten()
+        np.savetxt(self.input_dir / "structure.dat", flat_structure, fmt="%d")
+        # flat_structure.tofile(self.input_dir / "structure.dat")  # Save geometry
+
         np.save(self.input_dir / "structure.npy", self.structure)
+
+        vti_writer = VTIWriter(self.input_dir)
+        data = {"structure": self.structure}
+        vti_writer.write(data, "structure.vti")
