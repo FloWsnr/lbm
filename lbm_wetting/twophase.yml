@@ -1,14 +1,14 @@
 input_output:
-  file_name: "structure.vti" # Name of the input geometry file
+  file_name: "structure.npy" # Name of the input geometry file
 
 geometry:
-  crop:
-    x1: 0
-    x2: -1 # Use -1 for no cropping
-    y1: 0
-    y2: -1 # Use -1 for no cropping
-    z1: 0
-    z2: -1 # Use -1 for no cropping
+  crop: False # if True, crops the structure with the given values below
+  x1: 0
+  x2: 100
+  y1: 0
+  y2: 100
+  z1: 0
+  z2: 100
 
 materials:
   # [id in the loaded file, id in the palabos input file]
@@ -23,7 +23,6 @@ domain:
     y: True
     z: True
   inlet_outlet_layers: 4  # 3-4 recommended for 2-phase sim
-  double_geom_resolution: False  # False by default
 
 simulation:
   restart_sim: True # Set to true if you would like to continue from a previous saved state
@@ -69,7 +68,7 @@ simulation:
     G_ads_f1_s3: 0
     G_ads_f1_s4: 0
 
-  convergence: 1e-4  # Convergence threshold changed from 1e-4
+  convergence: 1e-3  # Convergence threshold changed from 1e-4
   convergence_iter: 500  # How often to check for convergence
   max_iterations: 500000  # max iterations per Pc step
   save_sim: True  # Save restart files

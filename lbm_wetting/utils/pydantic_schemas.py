@@ -5,18 +5,14 @@ from typing import Literal, List
 class InputOutput(BaseModel):
     file_name: str
 
-
-class Crop(BaseModel):
+class Geometry(BaseModel):
+    crop: bool
     x1: int
     x2: int
     y1: int
     y2: int
     z1: int
     z2: int
-
-
-class Geometry(BaseModel):
-    crop: Crop
 
 
 ##############################

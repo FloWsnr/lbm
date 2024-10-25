@@ -39,11 +39,17 @@ class PalabosGeometry:
         sim_dir = inputs["input_output"]["simulation_directory"]
         sim_dir = Path(sim_dir)
         structure_file = sim_dir / inputs["input_output"]["file_name"]
-        data = read_vti_file(structure_file)
-        org_structure = data["structure"]
+
+        if structure_file.suffix == ".vti":
+            data = read_vti_file(structure_file)
+            org_structure = data["structure"]
+        elif structure_file.suffix == ".npy":
+            org_structure = np.load(structure_file)
+        else:
+            raise ValueError(f"Unknown file type: {structure_file.suffix}")
 
         # crop the structure
-        self.structure = self._crop_structure(org_structure, inputs["geometry"]["crop"])
+        self.structure = self._crop_structure(org_structure, inputs["geometry"])
         # Tanspose x and z
         self.structure = self.structure.transpose([2, 1, 0])
 
@@ -53,11 +59,15 @@ class PalabosGeometry:
         self.input_dir = inputs["input_output"]["input_folder"]
         self.output_dir = inputs["input_output"]["output_folder"]
 
-    def _crop_structure(self, structure: np.ndarray, crop: dict) -> np.ndarray:
+    def _crop_structure(self, structure: np.ndarray, geom: dict) -> np.ndarray:
         """Crop the structure"""
-        return structure[
-            crop["x1"] : crop["x2"], crop["y1"] : crop["y2"], crop["z1"] : crop["z2"]
-        ]
+        crop = geom["crop"]
+        if crop:
+            return structure[
+                geom["x1"] : geom["x2"], geom["y1"] : geom["y2"], geom["z1"] : geom["z2"]
+            ]
+        else:
+            return structure
 
     def _extract_nw_fluid(self, structure: np.ndarray) -> np.ndarray:
         """
