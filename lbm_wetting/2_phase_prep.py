@@ -23,12 +23,6 @@ def update_config(config: dict, sim_dir: Path, sim_name: str) -> dict:
 
 
 def prep_2_phase_sim(config: dict):
-    # Steps
-    # 1) create geom for palabos
-    # 2) create palabos input file
-
-    print("  Preparing 2-phase simulation...")
-    # 1) Create Palabos geometry
     print("  Creating efficient geometry for Palabos...")
     palabos_geom = prep.PalabosGeometry(config)
     palabos_geom.convert_material_ids()
@@ -52,7 +46,7 @@ config_path = Path(args.config)
 sim_dir = Path(args.sim_dir)
 sim_name = args.sim_name
 
-print("Starting 2-phase simulation...")
+print("Starting preparation of 2-phase simulation...")
 print("  config:", config_path)
 print("  sim_dir:", sim_dir)
 print("  sim_name:", sim_name)
