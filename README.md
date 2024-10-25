@@ -43,6 +43,7 @@ conda install scipy
 conda install pyyaml
 conda install pyvista
 ```
+If you use another env name, make sure to change it in the `run.slrm` script.
 
 
 ## Usage
