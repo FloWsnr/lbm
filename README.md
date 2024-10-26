@@ -82,6 +82,20 @@ $G_{ads} = \frac{2\cdot \sigma }{r}\cdot cos(\Theta )$
 where $r$ is the radius of the pore space.
 The **adhesion parameters** are taken from [Huang et al. 2007](https://journals.aps.org/pre/abstract/10.1103/PhysRevE.76.066701).
 
+Typical values (G_ads 1 = - G_ads 2) from Huang et al. 2007 are listed here:
+
+| Case | G ads,2 | Contact angle computed from Eq | Contact angle measured |
+|---|---|---|---|
+| a | -0.4 | 156.4 | 158.3 |
+| b | -0.3 | 133.4 | 135.1 |
+| c | -0.2 | 117.3 | 117.0 |
+| d | -0.1 | 103.2 | 103.2 |
+| e | 0.1 | 76.8 | 75.3 |
+| f | 0.2 | 62.7 | 59.5 |
+| g | 0.3 | 46.6 | 40.6 |
+| h | 0.4 | 23.6 | 18.9 |
+
+
 ### Rotation
 Since MPLBM-UT simulates the drainage in the x-direction, the geometry is rotated before starting the palabos simulation.
 
