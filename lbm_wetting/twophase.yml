@@ -1,5 +1,5 @@
 input_output:
-  file_name: "structure.npy" # Name of the input geometry file
+  file_name: "structure.vti" # Name of the input geometry file
 
 geometry:
   crop: False # if True, crops the structure with the given values below
@@ -63,18 +63,18 @@ simulation:
     omega_f1: 1 # Kinematic viscosity
     omega_f2: 1 # Kinematic viscosity
     # Wetting forces from Huang et al. 2007
-    G_ads_f1_s1: 0.18
-    G_ads_f1_s2: -0.18
-    G_ads_f1_s3: 0
+    G_ads_f1_s1: -0.05 # Positive -> hydrophilic, negative -> hydrophobic
+    G_ads_f1_s2: -0.05
+    G_ads_f1_s3: -0.2
     G_ads_f1_s4: 0
 
-  convergence: 1e-3  # Convergence threshold changed from 1e-4
+  convergence: 1e-4  # Convergence threshold changed from 1e-4
   convergence_iter: 500  # How often to check for convergence
   max_iterations: 500000  # max iterations per Pc step
   save_sim: True  # Save restart files
-  save_iter: 10000  # How often to save restart files
-  gif_iter: 25000  # How often to save gifs
-  vtk_iter: 25000  # How often to save vtk files
+  save_iter: 1000  # How often to save restart files
+  gif_iter: 2000  # How often to save gifs
+  vtk_iter: 2000  # How often to save vtk files
   rho_f2_vtk: False  # When True, saves rho f1 and f2 vtks. If False, only saves rho f1 vtk
   print_geom: True  # Create vtk of geometry at beginning
-  print_stl: True  # Create stl of geometry at beginning
+  print_stl: False  # Create stl of geometry at beginning
