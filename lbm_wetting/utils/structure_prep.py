@@ -5,63 +5,7 @@ import numpy as np
 import scipy.ndimage.morphology
 import pyvista as pv
 
-
-def read_vti_file(path: Union[Path, str]) -> dict:
-    """Reads a vti/vtk file and converts it to a cp.ndarray
-    Only works for the vti files created by pyvista.
-
-    Parameters
-    ----------
-    path : Union[Path, str]
-        The path to the vti/vtk file.
-
-    Returns
-    -------
-    loaded_data : dict
-        A dictionary containing the data from the vti/vtk file
-    """
-    file = Path(path)
-    data = pv.read(file)
-    shape: tuple = data.dimensions
-    shape = tuple(x - 1 for x in shape)
-
-    loaded_data = {}
-    for key in data.cell_data.keys():
-        structure = data.cell_data[key]
-        structure = structure.reshape(shape, order="F")
-        loaded_data[key] = structure
-
-    return loaded_data
-
-
-class VTIWriter:
-    def __init__(self, directory: Union[Path, str]) -> None:
-        directory = Path(directory)
-        directory.mkdir(parents=True, exist_ok=True)
-        self.directory = directory
-
-        self.vti_file = None
-        self.grid = None
-
-    def write(self, data: dict, file_name: str) -> None:
-        vti_file = self.directory / file_name
-        self.vti_file = vti_file
-        if self.vti_file.exists():
-            raise FileExistsError(f"File {self.vti_file} already exists")
-
-        self.grid = pv.ImageData()
-        for key, value in data.items():
-            self._add_data(value, name=key)
-        self.grid.save(self.vti_file)
-
-    def _add_data(self, data: np.ndarray, name: str = "value") -> None:
-        if data.ndim == 2:
-            data = np.expand_dims(data, axis=2)
-        shape = np.array(data.shape) + 1
-        self.grid.dimensions = shape
-        self.grid.origin = (0, 0, 0)
-        self.grid.spacing = (1, 1, 1)
-        self.grid.cell_data[name] = data.flatten(order="F")
+from lbm_wetting.utils.vti_processing import VTIWriter, read_vti_file
 
 
 class PalabosGeometry:
@@ -267,8 +211,6 @@ class PalabosGeometry:
 
         flat_structure = self.structure.flatten(order="C")
         np.savetxt(self.input_dir / "structure.dat", flat_structure, fmt="%d")
-
-        np.save(self.input_dir / "structure.npy", self.structure)
 
         vti_writer = VTIWriter(self.input_dir)
         data = {"structure": self.structure}
