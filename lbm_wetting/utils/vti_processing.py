@@ -109,13 +109,15 @@ class VTIWriter:
 def process_vti_files(directory: Union[Path, str]) -> None:
     directory = Path(directory)
     output_folder = directory / "output"
+    processed_folder = directory / "processed"
+    processed_folder.mkdir(parents=True, exist_ok=True)
 
     structure_data = read_vti_file(directory.parent / "structure.vti")
     structure = structure_data["structure"]
 
-    writer = VTIWriter(output_folder, pvd_file=output_folder / "sim.pvd")
+    writer = VTIWriter(processed_folder, pvd_file=processed_folder / "sim.pvd")
     steady_state_writer = VTIWriter(
-        output_folder, pvd_file=output_folder / "steady_states.pvd"
+        processed_folder, pvd_file=processed_folder / "steady_states.pvd"
     )
 
     states = [f for f in output_folder.glob("rho_f1_*.vti")]
