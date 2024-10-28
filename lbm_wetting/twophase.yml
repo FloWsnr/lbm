@@ -2,6 +2,7 @@ input_output:
   file_name: "structure" # Name of the input geometry file
 
 geometry:
+  swap_xz: True
   crop: False # if True, crops the structure with the given values below
   x1: 0
   x2: 100
@@ -66,7 +67,7 @@ simulation:
     # Wetting forces from Huang et al. 2007
     # Positive -> hydrophilic, negative -> hydrophobic
     G_ads_f1_s1: -0.05 # Mat_id 1 # Carbon around 100 degrees
-    G_ads_f1_s2: -0.05 # Mat_id 4 # Binder around 100 degrees
+    G_ads_f1_s2: -0.35 # Mat_id 4 # Binder around 100 degrees
     G_ads_f1_s3: -0.35 # Mat_id 6 # PTFE around 140 degrees
     G_ads_f1_s4: 0
 

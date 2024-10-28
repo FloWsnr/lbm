@@ -5,6 +5,7 @@ from typing import Literal, List
 class InputOutput(BaseModel):
     file_name: str
 
+
 class Geometry(BaseModel):
     crop: bool
     x1: int
@@ -13,6 +14,7 @@ class Geometry(BaseModel):
     y2: int
     z1: int
     z2: int
+    swap_xz: bool
 
 
 ##############################

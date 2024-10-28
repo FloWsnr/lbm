@@ -6,6 +6,7 @@ import scipy.ndimage.morphology
 
 from lbm_wetting.utils.vti_processing import VTIWriter, read_vti_file
 
+
 def _load_structure(structure_file: Path) -> np.ndarray:
     if structure_file.suffix == ".vti":
         data = read_vti_file(structure_file)
@@ -32,13 +33,17 @@ class PalabosGeometry:
             if not file_with_suffix.exists():
                 file_with_suffix = structure_file.with_suffix(".npy")
                 if not file_with_suffix.exists():
-                    raise FileNotFoundError(f"Structure file not found: {structure_file}")
+                    raise FileNotFoundError(
+                        f"Structure file not found: {structure_file}"
+                    )
             org_structure = _load_structure(file_with_suffix)
 
         # crop the structure
         self.structure = self._crop_structure(org_structure, inputs["geometry"])
-        # swap x and z
-        self.structure = np.swapaxes(self.structure, 0, 2)
+
+        if inputs["geometry"]["swap_xz"]:
+            # swap x and z
+            self.structure = np.swapaxes(self.structure, 0, 2)
 
         self.inout_layers = inputs["domain"]["inlet_outlet_layers"]
         self.materials = inputs["materials"]
@@ -176,6 +181,7 @@ class PalabosGeometry:
             The structure array with inlet and outlet layers added
 
         """
+
         structure = np.pad(
             structure,
             ((num_layers, num_layers), (0, 0), (0, 0)),
