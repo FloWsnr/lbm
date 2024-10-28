@@ -227,4 +227,4 @@ class PalabosGeometry:
 
         vti_writer = VTIWriter(self.input_dir)
         data = {"structure": self.structure}
-        vti_writer.write(data, "structure.vti")
+        vti_writer.write_vti(data, "structure.vti")
