@@ -3,9 +3,18 @@ from typing import Optional, Union
 
 import numpy as np
 import scipy.ndimage.morphology
-import pyvista as pv
 
 from lbm_wetting.utils.vti_processing import VTIWriter, read_vti_file
+
+def _load_structure(structure_file: Path) -> np.ndarray:
+    if structure_file.suffix == ".vti":
+        data = read_vti_file(structure_file)
+        org_structure = data["structure"]
+    elif structure_file.suffix == ".npy":
+        org_structure = np.load(structure_file)
+    else:
+        raise FileNotFoundError(f"Structure file not found: {structure_file}")
+    return org_structure
 
 
 class PalabosGeometry:
@@ -14,13 +23,17 @@ class PalabosGeometry:
         sim_dir = Path(sim_dir)
         structure_file = sim_dir / inputs["input_output"]["file_name"]
 
-        if structure_file.suffix == ".vti":
-            data = read_vti_file(structure_file)
-            org_structure = data["structure"]
-        elif structure_file.suffix == ".npy":
-            org_structure = np.load(structure_file)
-        else:
-            raise ValueError(f"Unknown file type: {structure_file.suffix}")
+        try:
+            org_structure = _load_structure(structure_file)
+        except FileNotFoundError:
+            print(f"Structure file not found: {structure_file}")
+            print("Trying to find file with suffix .vti or .npy...")
+            file_with_suffix = structure_file.with_suffix(".vti")
+            if not file_with_suffix.exists():
+                file_with_suffix = structure_file.with_suffix(".npy")
+                if not file_with_suffix.exists():
+                    raise FileNotFoundError(f"Structure file not found: {structure_file}")
+            org_structure = _load_structure(file_with_suffix)
 
         # crop the structure
         self.structure = self._crop_structure(org_structure, inputs["geometry"])
