@@ -55,32 +55,18 @@ class VTIWriter:
             self.pvd_root = None
             self.pvd_collection = None
 
-        self.vti_file = None
         self.grid = None
 
-    def write(self, data: dict, file_name: str, timestep: int = 0) -> None:
-        self._open_file(file_name)
+    def write_vti(self, data: dict, file_name: str, timestep: int = 0) -> None:
+        vti_file = self.directory / file_name
+        # make clean grid
+        self.grid = pv.ImageData()
         for key, value in data.items():
             self._add_data(value, name=key)
-        self._save_timestep(timestep)
 
-    def write_pvd(self, file_name: str, timestep: int = 0) -> None:
-        """Add a file to the pvd collection without writing a vti file"""
-        self._open_file(file_name)
-        self._save_timestep(timestep)
-
-    def close(self) -> None:
-        if self.pvd_root is not None:
-            self._save_pvd()
-
-    def _open_file(self, file_name: str) -> None:
-        vti_file = self.directory / file_name
-        self.vti_file = vti_file
-
-        # if self.vti_file.exists():
-        #     raise FileExistsError(f"File {self.vti_file} already exists")
-
-        self.grid = pv.ImageData()
+        # save the grid
+        self.grid.save(vti_file)
+        self._save_timestep(vti_file, timestep)
 
     def _add_data(self, data: np.ndarray, name: str = "value") -> None:
         if data.ndim == 2:
@@ -91,15 +77,23 @@ class VTIWriter:
         self.grid.spacing = (1, 1, 1)
         self.grid.cell_data[name] = data.flatten(order="F")
 
-    def _save_timestep(self, timestep: int) -> None:
-        self.grid.save(self.vti_file)
+    def write_pvd(self, file_name: str, timestep: int = 0) -> None:
+        """Add a file to the pvd collection without writing a vti file"""
+        vti_file = self.directory / file_name
+        self._save_timestep(vti_file, timestep)
+
+    def _save_timestep(self, vti_file: Path, timestep: int) -> None:
         if self.pvd_root is not None:
             timestep = ET.SubElement(
                 self.pvd_collection,
                 "DataSet",
                 timestep=str(timestep),
-                file=str(self.vti_file.relative_to(self.directory)),
+                file=str(vti_file.relative_to(self.directory)),
             )
+
+    def close(self) -> None:
+        if self.pvd_root is not None:
+            self._save_pvd()
 
     def _save_pvd(self) -> None:
         tree = ET.ElementTree(self.pvd_root)
@@ -112,8 +106,20 @@ def process_vti_files(directory: Union[Path, str]) -> None:
     processed_folder = directory / "processed"
     processed_folder.mkdir(parents=True, exist_ok=True)
 
-    structure_data = read_vti_file(directory.parent / "structure.vti")
-    structure = structure_data["structure"]
+    assert processed_folder.exists(), "Processed folder does not exist"
+
+    # check if structure.vti exists
+    structure_file = directory.parent / "structure.vti"
+    if not structure_file.exists():
+        # try to find file with suffix .npy
+        file_with_suffix = structure_file.with_suffix(".npy")
+        if not file_with_suffix.exists():
+            raise FileNotFoundError(f"Structure file not found: {structure_file}")
+        structure_file = file_with_suffix
+        structure = np.load(structure_file)
+    else:
+        structure_data = read_vti_file(structure_file)
+        structure = structure_data["structure"]
 
     writer = VTIWriter(processed_folder, pvd_file=processed_folder / "sim.pvd")
     steady_state_writer = VTIWriter(
@@ -145,7 +151,7 @@ def process_vti_files(directory: Union[Path, str]) -> None:
         comp2 = file.stem.split("_")[3]
         file_name = "sim_" + comp1 + "_" + comp2 + ".vti"
         time_step = float(comp1 + "." + comp2)
-        writer.write(data, file_name, time_step)
+        writer.write_vti(data, file_name, time_step)
 
         if i in steady_states:
             steady_state_writer.write_pvd(file_name, time_step)
@@ -172,5 +178,6 @@ def _convert_density(density: np.ndarray, structure: np.ndarray) -> np.ndarray:
 
 
 if __name__ == "__main__":
-    directory = Path("/hpcwork/fw641779/lbm/Toray-120C/55cov/structure0/test_run")
+    directory = Path("/hpcwork/fw641779/lbm/Test_PorousMedia/test_run")
+    # directory = Path("/hpcwork/fw641779/lbm/Toray-120C/55cov/structure0/test_run")
     process_vti_files(directory)
