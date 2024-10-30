@@ -51,8 +51,8 @@ class FluidInit(BaseModel):
 
 class FluidData(BaseModel):
     Gc: float
-    omega_f1: int
-    omega_f2: int
+    omega_f1: float
+    omega_f2: float
     G_ads_f1_s1: float
     G_ads_f1_s2: float
     G_ads_f1_s3: float
@@ -61,12 +61,12 @@ class FluidData(BaseModel):
 
 class Simulation(BaseModel):
     restart_sim: bool
-    rho_f1: int
-    rho_f2: int
-    force_f1: int
-    force_f2: int
+    rho_f1: float
+    rho_f2: float
+    force_f1: float
+    force_f2: float
     pressure_bc: bool
-    minimum_radius: int
+    minimum_radius: float
     num_pressure_steps: int
     fluid_init: Literal["drainage", "custom"]
     fluid_1_init: FluidInit
