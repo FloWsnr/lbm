@@ -4,6 +4,9 @@ from typing import Union
 import xml.etree.cElementTree as ET
 
 import pyvista as pv
+import yaml
+
+import lbm_wetting.utils.pydantic_schemas as schemas
 
 
 def read_vti_file(path: Union[Path, str]) -> dict:
@@ -100,16 +103,17 @@ class VTIWriter:
         tree.write(self.pvd_file)
 
 
-def process_vti_files(directory: Union[Path, str]) -> None:
-    directory = Path(directory)
-    output_folder = directory / "output"
-    processed_folder = directory / "processed"
+def process_vti_files(config: dict) -> None:
+    sim_dir = Path(config["input_output"]["simulation_directory"])
+
+    output_folder = config["input_output"]["output_folder"]
+    processed_folder = output_folder.parent / "processed"
     processed_folder.mkdir(parents=True, exist_ok=True)
 
     assert processed_folder.exists(), "Processed folder does not exist"
 
     # check if structure.vti exists
-    structure_file = directory.parent / "structure.vti"
+    structure_file = sim_dir / "structure.vti"
     if not structure_file.exists():
         # try to find file with suffix .npy
         file_with_suffix = structure_file.with_suffix(".npy")
@@ -143,6 +147,12 @@ def process_vti_files(directory: Union[Path, str]) -> None:
         density_data = read_vti_file(file)
         density = density_data["Density"]
 
+        # slice density to remove the input/output layers from the z axes
+        swap_xz = config["geometry"]["swap_xz"]
+        num_layers = config["domain"]["inlet_outlet_layers"]
+        density = density[num_layers:-num_layers, :, :]
+        if swap_xz:
+            density = np.swapaxes(density, 0, 2)
         wet_structure = _convert_density(density, structure)
 
         data = {"wet_structure": wet_structure}
@@ -161,11 +171,6 @@ def process_vti_files(directory: Union[Path, str]) -> None:
 
 
 def _convert_density(density: np.ndarray, structure: np.ndarray) -> np.ndarray:
-    # transpose density to match the structure
-    density = np.swapaxes(density, 0, 2)
-    # remove the input/output layers from the z axes
-    density = density[:, :, 4:-4]
-
     water = density > 1
     solid = structure != 0
 
@@ -177,7 +182,43 @@ def _convert_density(density: np.ndarray, structure: np.ndarray) -> np.ndarray:
     return wet_structure
 
 
+def parse_input_file(file: Path) -> dict:
+    with open(file) as f:
+        config = yaml.full_load(f)
+    config = schemas.Config(**config).model_dump()
+    return config
+
+
+def update_config(config: dict, sim_dir: Path, sim_name: str) -> dict:
+    config["input_output"]["simulation_directory"] = sim_dir
+    config["input_output"]["simulation_name"] = sim_name
+    config["input_output"]["input_folder"] = Path(sim_dir) / sim_name / "input"
+    config["input_output"]["output_folder"] = Path(sim_dir) / sim_name / "output"
+
+    return config
+
+
 if __name__ == "__main__":
-    directory = Path("/hpcwork/fw641779/lbm/Test_PorousMedia/test_run")
-    # directory = Path("/hpcwork/fw641779/lbm/Toray-120C/55cov/structure0/test_run")
-    process_vti_files(directory)
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Process VTI files for LBM wetting simulation."
+    )
+    parser.add_argument("config", type=Path, help="Path to the configuration file")
+    parser.add_argument("sim_dir", type=Path, help="Simulation directory")
+    parser.add_argument("sim_name", type=str, help="Simulation name")
+    args = parser.parse_args()
+
+    config_path = Path(args.config)
+    sim_dir = Path(args.sim_dir)
+    sim_name = args.sim_name
+
+    print("Processing VTI files for 2-phase simulation...")
+    print("  config:", config_path)
+    print("  sim_dir:", sim_dir)
+    print("  sim_name:", sim_name)
+
+    config = parse_input_file(config_path)
+    config = update_config(config, sim_dir, sim_name)
+
+    process_vti_files(config)

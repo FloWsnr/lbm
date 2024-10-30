@@ -85,3 +85,6 @@ else
     $MPIEXEC $FLAGS_MPI_BATCH $palabos_dir $input_file
     # mpirun -np 4 $palabos_dir $input_file
 fi
+
+# Process VTI files
+python /home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/utils/vti_processing.py $config_file $sim_dir $sim_name
