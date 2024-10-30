@@ -47,7 +47,7 @@ module load OpenMPI/4.1.4
 # Set up paths
 palabos_dir="/home/fw641779/Coding/lattice-boltzmann-wetting/mplbm-ut-mirror/src/2-phase_LBM/ShanChen"
 config_file="/home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/twophase.yml"
-sim_dir="/hpcwork/fw641779/lbm/Test_Cones"
+sim_dir="/hpcwork/fw641779/lbm/Test_Tubes"
 # sim_dir="/hpcwork/fw641779/lbm/Toray-120C/55cov/structure0"
 sim_name="test_run_1"
 
@@ -66,9 +66,17 @@ else
 fi
 unset __conda_setup
 # <<< conda initialize <<<
+
+#####################################################################################
+############################# 2-phase prep ##########################################
+#####################################################################################
+echo "2-phase prep"
+echo "config_file: $config_file"
+echo "sim_dir: $sim_dir"
+echo "sim_name: $sim_name"
+
 # Activate environment (will work whether conda was just initialized or was already available)
 conda activate lbm
-
 # Capture Python output and errors in a variable and run the script
 python_output=$(python /home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/2_phase_prep.py $config_file $sim_dir $sim_name 2>&1)
 
@@ -83,8 +91,7 @@ else
     # Else continue with running the simulation
     input_file=$sim_dir/$sim_name/input/2_phase_sim_input.xml
     $MPIEXEC $FLAGS_MPI_BATCH $palabos_dir $input_file
-    # mpirun -np 4 $palabos_dir $input_file
 fi
 
-# Process VTI files
-python /home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/utils/vti_processing.py $config_file $sim_dir $sim_name
+# # Process VTI files
+python /home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/utils/vti_processing.py $sim_dir $sim_name
