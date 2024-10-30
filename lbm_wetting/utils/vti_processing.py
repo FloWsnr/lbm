@@ -6,8 +6,6 @@ import xml.etree.cElementTree as ET
 import pyvista as pv
 import yaml
 
-import lbm_wetting.utils.pydantic_schemas as schemas
-
 
 def read_vti_file(path: Union[Path, str]) -> dict:
     """Reads a vti/vtk file and converts it to a cp.ndarray
@@ -107,6 +105,7 @@ def process_vti_files(config: dict) -> None:
     sim_dir = Path(config["input_output"]["simulation_directory"])
 
     output_folder = config["input_output"]["output_folder"]
+    output_folder = Path(output_folder)
     processed_folder = output_folder.parent / "processed"
     processed_folder.mkdir(parents=True, exist_ok=True)
 
@@ -185,40 +184,40 @@ def _convert_density(density: np.ndarray, structure: np.ndarray) -> np.ndarray:
 def parse_input_file(file: Path) -> dict:
     with open(file) as f:
         config = yaml.full_load(f)
-    config = schemas.Config(**config).model_dump()
-    return config
-
-
-def update_config(config: dict, sim_dir: Path, sim_name: str) -> dict:
-    config["input_output"]["simulation_directory"] = sim_dir
-    config["input_output"]["simulation_name"] = sim_name
-    config["input_output"]["input_folder"] = Path(sim_dir) / sim_name / "input"
-    config["input_output"]["output_folder"] = Path(sim_dir) / sim_name / "output"
-
     return config
 
 
 if __name__ == "__main__":
     import argparse
 
+    default_sim_dir = Path("/hpcwork/fw641779/lbm/Test_Tubes")
+    default_sim_name = "test_run_2"
+
     parser = argparse.ArgumentParser(
         description="Process VTI files for LBM wetting simulation."
     )
-    parser.add_argument("config", type=Path, help="Path to the configuration file")
-    parser.add_argument("sim_dir", type=Path, help="Simulation directory")
-    parser.add_argument("sim_name", type=str, help="Simulation name")
+    parser.add_argument(
+        "sim_dir",
+        type=Path,
+        nargs="?",
+        default=default_sim_dir,
+        help="Simulation directory",
+    )
+    parser.add_argument(
+        "sim_name",
+        type=str,
+        nargs="?",
+        default=default_sim_name,
+        help="Simulation name",
+    )
     args = parser.parse_args()
 
-    config_path = Path(args.config)
     sim_dir = Path(args.sim_dir)
     sim_name = args.sim_name
 
     print("Processing VTI files for 2-phase simulation...")
-    print("  config:", config_path)
-    print("  sim_dir:", sim_dir)
-    print("  sim_name:", sim_name)
 
+    config_path = sim_dir / sim_name / "input" / "config.yml"
     config = parse_input_file(config_path)
-    config = update_config(config, sim_dir, sim_name)
 
     process_vti_files(config)

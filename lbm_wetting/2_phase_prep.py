@@ -41,6 +41,22 @@ def prep_2_phase_sim(config: dict):
     palabos_file = PalabosInputFile(config)
     palabos_file.create_input_file()
 
+    # Save config in input folder
+    config_path = config["input_output"]["input_folder"] / "config.yml"
+    _dump_config(config, config_path)
+
+
+def _dump_config(config: dict, config_path: Path):
+    # Remove the structure from the config
+    config.pop("structure")
+    # convert paths to strings
+    for key, value in config["input_output"].items():
+        if isinstance(value, Path):
+            config["input_output"][key] = str(value)
+
+    with open(config_path, "w") as f:
+        yaml.dump(config, f)
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("config", type=Path, help="Path to the configuration file")
