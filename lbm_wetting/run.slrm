@@ -47,9 +47,9 @@ module load OpenMPI/4.1.4
 # Set up paths
 palabos_dir="/home/fw641779/Coding/lattice-boltzmann-wetting/mplbm-ut-mirror/src/2-phase_LBM/ShanChen"
 config_file="/home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/twophase.yml"
-sim_dir="/hpcwork/fw641779/lbm/Test_Tubes"
+sim_dir="/hpcwork/fw641779/lbm/Test_Cones"
 # sim_dir="/hpcwork/fw641779/lbm/Toray-120C/55cov/structure0"
-sim_name="test_run_1"
+sim_name="test_run_3"
 
 export CONDA_ROOT=$HOME/miniconda3
 # >>> conda initialize >>>
@@ -94,4 +94,4 @@ else
 fi
 
 # # Process VTI files
-python /home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/utils/vti_processing.py $sim_dir $sim_name
+python /home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/utils/postprocessing/vti_processing.py $sim_dir $sim_name

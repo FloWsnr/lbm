@@ -4,7 +4,7 @@ from typing import Optional, Union
 import numpy as np
 import scipy.ndimage.morphology
 
-from lbm_wetting.utils.vti_processing import VTIWriter, read_vti_file
+from lbm_wetting.utils.postprocessing.vti_processing import VTIWriter, read_vti_file
 
 
 def _load_structure(structure_file: Path) -> np.ndarray:
