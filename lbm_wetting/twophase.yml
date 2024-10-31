@@ -21,8 +21,8 @@ materials:
 domain:
   periodic_boundary:
     x: False
-    y: True
-    z: True
+    y: False
+    z: False
   inlet_outlet_layers: 4  # 3-4 recommended for 2-phase sim
 
 simulation:
@@ -38,8 +38,9 @@ simulation:
 
   # For pressure difference boundary conditions
   pressure_bc: True
-  minimum_radius: 1 # Correlated to delta rho in docs. This acts as entry pressure, so set 1-3 voxels lower than inscribed sphere radius
-  num_pressure_steps: 20
+  minimum_radius: 3 # Correlated to delta rho in docs. This acts as entry pressure, so set 1-3 voxels lower than inscribed sphere radius
+  num_pressure_steps: 10
+  # The actual pressure difference is calculated from the minimum radius and the contact angle of the first material. Make sure that the first material is the non-wetting material.
 
   # Initial Conditions
   fluid_init: drainage  # If drainage, traditional drainage setup used. If custom, use fluid 1/2 init to do custom fluid setup
@@ -66,8 +67,8 @@ simulation:
 
     # Wetting forces from Huang et al. 2007
     # Positive -> hydrophilic, negative -> hydrophobic
-    G_ads_f1_s1: -0.05 # Mat_id 1 # Carbon around 100 degrees
-    G_ads_f1_s2: -0.35 # Mat_id 4 # Binder around 100 degrees
+    G_ads_f1_s1: -0.35 # Mat_id 1 # Carbon around 100 degrees
+    G_ads_f1_s2: 0.35 # Mat_id 4 # Binder around 100 degrees
     G_ads_f1_s3: -0.35 # Mat_id 6 # PTFE around 140 degrees
     G_ads_f1_s4: 0
 
