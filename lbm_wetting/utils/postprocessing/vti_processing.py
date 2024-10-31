@@ -6,6 +6,8 @@ import xml.etree.cElementTree as ET
 import pyvista as pv
 import yaml
 
+from lbm_wetting.utils.postprocessing.video_writer import VideoWriter
+
 
 def read_vti_file(path: Union[Path, str]) -> dict:
     """Reads a vti/vtk file and converts it to a cp.ndarray
@@ -142,6 +144,9 @@ def process_vti_files(config: dict) -> None:
             steady_states.append(i)
     steady_states.append(len(states) - 1)
 
+    # start video writer
+    video_writer = VideoWriter(processed_folder / "video.gif", fps=5, upsample_rate=2)
+
     for i, file in enumerate(states):
         density_data = read_vti_file(file)
         density = density_data["Density"]
@@ -165,8 +170,14 @@ def process_vti_files(config: dict) -> None:
         if i in steady_states:
             steady_state_writer.write_pvd(file_name, time_step)
 
+        # write video
+        slice_index = int(wet_structure.shape[0] / 2)
+        wet_structure_slice = wet_structure[slice_index, :, :]
+        video_writer.write(wet_structure_slice)
+
     writer.close()
     steady_state_writer.close()
+    video_writer.close()
 
 
 def _convert_density(density: np.ndarray, structure: np.ndarray) -> np.ndarray:
@@ -190,8 +201,8 @@ def parse_input_file(file: Path) -> dict:
 if __name__ == "__main__":
     import argparse
 
-    default_sim_dir = Path("/hpcwork/fw641779/lbm/Test_Tubes")
-    default_sim_name = "test_run_2"
+    default_sim_dir = Path("/hpcwork/fw641779/lbm/Test_Cones")
+    default_sim_name = "test_run_3"
 
     parser = argparse.ArgumentParser(
         description="Process VTI files for LBM wetting simulation."

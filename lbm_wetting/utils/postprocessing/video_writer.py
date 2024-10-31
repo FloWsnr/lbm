@@ -7,7 +7,6 @@ from PIL import Image
 
 class VideoWriter:
     def __init__(self, file: Path | str, fps: int = 30, upsample_rate: int = 0) -> None:
-        self.converter = None
         self.image_stack = None
         self.file = None
         self.fps = fps
@@ -28,24 +27,23 @@ class VideoWriter:
         else:
             raise ValueError("File format not supported. Use .mp4 or .gif")
 
-    def write(self, frame: np.ndarray, base_image: np.ndarray | None = None) -> None:
-        if self.converter is not None:
-            if base_image is not None:
-                frame = self.converter.convert(base_image=base_image, input_map=frame)
-            else:
-                frame = self.converter.convert_structure(input_map=frame)
-        else:
-            if frame.ndim == 2:
-                # Convert to rgb image
-                frame = np.stack([frame] * 3, axis=-1)
+    def write(self, frame: np.ndarray) -> None:
+        # convert color of the frame
+        colored_frame = np.copy(frame)
+        colored_frame[frame == 255] = 0
+        colored_frame[frame == 200] = 100
+        colored_frame[frame == 0] = 255
+
+        colored_frame = np.stack([colored_frame] * 3, axis=-1, dtype=np.uint8)
+        colored_frame[frame == 128] = np.array([0, 86, 158], dtype=np.uint8)
 
         if self.upsample_rate > 0:
-            frame = self._upsample(frame, self.upsample_rate)
+            colored_frame = self._upsample(colored_frame, self.upsample_rate)
 
         if self.format == ".mp4":
-            self.file.write_frame(frame)
+            self.file.write_frame(colored_frame)
         elif self.format == ".gif":
-            self.image_stack.append(frame)
+            self.image_stack.append(colored_frame)
 
     def close(self) -> None:
         if self.format == ".gif":
@@ -65,4 +63,9 @@ class VideoWriter:
             append_images=image_stack[1:],
             duration=1000 / self.fps,
             loop=0,
+        )
+
+    def _upsample(self, frame: np.ndarray, upsample_rate: int) -> np.ndarray:
+        return np.kron(
+            frame, np.ones((upsample_rate, upsample_rate, 1), dtype=np.uint8)
         )
