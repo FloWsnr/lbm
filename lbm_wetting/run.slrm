@@ -49,7 +49,7 @@ palabos_dir="/home/fw641779/Coding/lattice-boltzmann-wetting/mplbm-ut-mirror/src
 config_file="/home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/twophase.yml"
 sim_dir="/hpcwork/fw641779/lbm/Test_Tubes"
 # sim_dir="/hpcwork/fw641779/lbm/Toray-120C/55cov/structure0"
-sim_name="test_run_3"
+sim_name="test_run_5"
 
 export CONDA_ROOT=$HOME/miniconda3
 # >>> conda initialize >>>
@@ -70,10 +70,12 @@ unset __conda_setup
 #####################################################################################
 ############################# 2-phase prep ##########################################
 #####################################################################################
-echo "2-phase prep"
+echo "--------------------------------"
+echo "Starting 2-phase prep..."
 echo "config_file: $config_file"
 echo "sim_dir: $sim_dir"
 echo "sim_name: $sim_name"
+echo "--------------------------------"
 
 # Activate environment (will work whether conda was just initialized or was already available)
 conda activate lbm
@@ -90,8 +92,22 @@ if [ $return_code -ne 0 ]; then
 else
     # Else continue with running the simulation
     input_file=$sim_dir/$sim_name/input/2_phase_sim_input.xml
+
+    # Start time measurement
+    start_time=$(date +%s)
+
     $MPIEXEC $FLAGS_MPI_BATCH $palabos_dir $input_file
+
+    # Calculate and output elapsed time
+    end_time=$(date +%s)
+    elapsed_time=$((end_time - start_time))
+    echo "--------------------------------"
+    echo "Simulation completed in $(($elapsed_time / 60)) minutes"
+    echo "--------------------------------"
 fi
 
 # # Process VTI files
 python /home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/utils/postprocessing/vti_processing.py $sim_dir $sim_name
+
+## Copy the output file to the simulation directory
+cp /hpcwork/fw641779/lbm/output_logs/two-phase_lbm_$SLURM_JOB_ID.out $sim_dir/$sim_name/output/log.out
