@@ -1,3 +1,11 @@
+"""
+Prepares the 2-phase simulation.
+This means converting the structure to a format that can be used by Palabos and creating the input file.
+
+Creator: Florian Wiesner
+Date: 2024-11-08
+"""
+
 from pathlib import Path
 import yaml
 import argparse
@@ -15,6 +23,10 @@ def parse_input_file(file: Path) -> dict:
 
 
 def update_config(config: dict, sim_dir: Path, sim_name: str) -> dict:
+    """
+    Update the config with the simulation directory and name.
+    If the simulation directory already exists, increment the sim_name.
+    """
     sim_run_dir = Path(sim_dir) / sim_name
     if sim_run_dir.exists():
         print("  Simulation directory already exists. Incrementing sim_name.")
@@ -29,6 +41,9 @@ def update_config(config: dict, sim_dir: Path, sim_name: str) -> dict:
 
 
 def prep_2_phase_sim(config: dict):
+    """
+    Prepare the 2-phase simulation.
+    """
     print("  Creating efficient geometry for Palabos...")
     palabos_geom = prep.PalabosGeometry(config)
     palabos_geom.convert_material_ids()
@@ -47,6 +62,9 @@ def prep_2_phase_sim(config: dict):
 
 
 def _dump_config(config: dict, config_path: Path):
+    """
+    Dump the config to a file.
+    """
     # Remove the structure from the config
     config.pop("structure")
     # convert paths to strings

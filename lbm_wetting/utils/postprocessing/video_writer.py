@@ -6,6 +6,15 @@ from PIL import Image
 
 
 class VideoWriter:
+    """
+    Writes a video to a file.
+    Can either write a .mp4 or .gif file.
+
+
+    Creator: Florian Wiesner
+    Date: 2024-11-08
+    """
+
     def __init__(self, file: Path | str, fps: int = 30, upsample_rate: int = 0) -> None:
         self.image_stack = None
         self.file = None

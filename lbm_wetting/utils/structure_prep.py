@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional, Union
 
 import numpy as np
 import scipy.ndimage.morphology
@@ -22,21 +21,17 @@ class PalabosGeometry:
     def __init__(self, inputs: dict):
         sim_dir = inputs["input_output"]["simulation_directory"]
         sim_dir = Path(sim_dir)
-        structure_file = sim_dir / inputs["input_output"]["file_name"]
 
-        try:
-            org_structure = _load_structure(structure_file)
-        except FileNotFoundError:
-            print(f"Structure file not found: {structure_file}")
-            print("Trying to find file with suffix .vti or .npy...")
-            file_with_suffix = structure_file.with_suffix(".vti")
-            if not file_with_suffix.exists():
-                file_with_suffix = structure_file.with_suffix(".npy")
-                if not file_with_suffix.exists():
-                    raise FileNotFoundError(
-                        f"Structure file not found: {structure_file}"
-                    )
-            org_structure = _load_structure(file_with_suffix)
+        # Search for the structure file
+        file_name = inputs["input_output"]["file_name"]
+        files = list(sim_dir.glob(f"{file_name}.*"))
+        if len(files) == 0:
+            raise FileNotFoundError(f"Structure file not found: {file_name}")
+        elif len(files) > 1:
+            raise FileNotFoundError(f"Multiple structure files found: {file_name}")
+        structure_file = files[0]
+
+        org_structure = _load_structure(structure_file)
 
         # crop the structure
         self.structure = self._crop_structure(org_structure, inputs["geometry"])
@@ -66,6 +61,7 @@ class PalabosGeometry:
     def _extract_nw_fluid(self, structure: np.ndarray) -> np.ndarray:
         """
         Extracts the non-wetting fluid from a structure
+        Is only needed if you want water present in the structure at the beginning of the simulation.
 
         Parameters
         ----------
@@ -102,7 +98,8 @@ class PalabosGeometry:
 
     def _get_surface(self, structure: np.ndarray) -> np.ndarray:
         """
-        Gets the surface from a structure
+        Gets the surface from a structure.
+        This means all voxels that are solid but directly next to the pores.
 
         Parameters
         ----------
@@ -147,7 +144,11 @@ class PalabosGeometry:
         return solid
 
     def _add_boundary_bounces(self, structure: np.ndarray) -> np.ndarray:
-        """Adds boundary bounces to a structure"""
+        """Adds boundary bounces to a structure.
+        Places a layer of solid material (phase 1) around the structure.
+        Is needed so that all solid voxels at the surface are solid phase 1 and not phase 2.
+        Phase 2 is the inner solid phase.
+        """
         solid = self._get_solid(structure)
 
         structure[0, :, :] = 1

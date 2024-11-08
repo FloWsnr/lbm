@@ -1,3 +1,11 @@
+"""
+Pydantic schemas for the config file.
+Used to validate the config file.
+
+Creator: Florian Wiesner
+Date: 2024-11-08
+"""
+
 from pydantic import BaseModel
 from typing import Literal, List
 

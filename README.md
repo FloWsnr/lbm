@@ -96,17 +96,12 @@ Typical values (G_ads 1 = - G_ads 2) from Huang et al. 2007 are listed here:
 | h | 0.4 | 23.6 | 18.9 |
 
 
-### Rotation
-Since MPLBM-UT simulates the drainage in the x-direction, the geometry is rotated before starting the palabos simulation.
-
-### Run time
-The runtime depends on the number of pressure steps, the number of cores and the resolution of the geometry.
-For 48 cores and 12 pressure steps, a simulation with a domain of (200x200x280) takes approx. 5 hours per pressure step.
-
 ### Capillary pressure
 
 MPLBM-UT calculates the **maximum capillary pressure** (i.e. contact angle and density)
-from the selected adhesion parameters, whereby only G_ads_f1_s1 and the density of fluid 1 are used in the equation.
+from the selected adhesion parameters, whereby only G_ads_f1_s1 and the density of fluid 1 are used in the equation!
+Therefore, the contact angle of phase 1 should be the highest (most hydrophobic).
+
 Additional parameters are the interparticle (cohesive) force, the minimum radius, the dissolved density and the interfacial tension.
 Stable values are, $G_{c} = 0.9$, r = 3, $\rho _{d} = 0.06$ and $\sigma = 0.15$. The **unit conversion** can be done with the help of the
 **Euler and Weber number**, detailed information can be found in the master thesis by Nicklas Bielfeldt 2023 titled "Multiphase simulation in porous electrodes".
@@ -114,3 +109,12 @@ Stable values are, $G_{c} = 0.9$, r = 3, $\rho _{d} = 0.06$ and $\sigma = 0.15$.
 $p_{c} = p_{nw} - p_{w} = \frac{\Delta \rho }{3} = \frac{2\cdot \sigma }{r}\cdot cos(\Theta )$
 
 $cos(\Theta ) = \frac{4\cdot |G_{ads,s1}|}{G_{c}(\rho _{1} - \rho _{d} )}$
+
+
+
+### Rotation
+Since MPLBM-UT simulates the drainage in the x-direction, the geometry is rotated before starting the palabos simulation.
+
+### Run time
+The runtime depends on the number of pressure steps, the number of cores and the resolution of the geometry.
+For 48 cores and 12 pressure steps, a simulation with a domain of (200x200x280) takes approx. 5 hours per pressure step.

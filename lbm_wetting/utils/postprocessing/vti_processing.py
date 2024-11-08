@@ -1,3 +1,12 @@
+"""
+Processes the vti files created by the simulation.
+Reading and writing the vti files.
+Writing also includes a pvd file for paraview to bundle the vti files.
+
+Creator: Florian Wiesner
+Date: 2024-11-08
+"""
+
 import numpy as np
 from pathlib import Path
 from typing import Union
@@ -104,6 +113,14 @@ class VTIWriter:
 
 
 def process_vti_files(config: dict) -> None:
+    """Long and ugly function to process the vti files after the simulation.
+
+    Converts the densities to a material (uint8) structure. Thus saves a lot of space.
+    Writes a small video of the simulation for immediate inspection.
+    Writes a pvd file for paraview to bundle the vti files.
+
+    Writes two pvd files, one for the whole simulation and one for the steady states.
+    """
     sim_dir = Path(config["input_output"]["simulation_directory"])
 
     output_folder = config["input_output"]["output_folder"]

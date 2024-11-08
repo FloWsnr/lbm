@@ -2,7 +2,7 @@ input_output:
   file_name: "structure" # Name of the input geometry file
 
 geometry:
-  swap_xz: True
+  swap_xz: True # In our convention, z is the flow direction, but palabos wants x
   crop: False # if True, crops the structure with the given values below
   x1: 0
   x2: 100
@@ -13,7 +13,7 @@ geometry:
 
 materials:
   # [id in the loaded file, id in the palabos input file]
-  - [255, 1]
+  - [255, 1] # Should be the most hydrophobic material
   - [200, 4]
   - [150, 6]
   - [128, 3] # This is the non-wetting fluid
@@ -23,12 +23,13 @@ domain:
     x: False
     y: False
     z: False
-  inlet_outlet_layers: 4  # 3-4 recommended for 2-phase sim
+  inlet_outlet_layers: 4  # 3-4 recommended for 2-phase sim. Number of empty layers at the inlet and outlet
 
 simulation:
-  restart_sim: True # Set to true if you would like to continue from a previous saved state
+  restart_sim: True # Set to true if you would like to continue from a previous saved state. Otherwise, palabos will start from scratch.
 
   # Fluid densities
+  # Best to use 2 for both fluids. Large difference in density can lead to instabilities.
   rho_f1: 2
   rho_f2: 2
 
@@ -37,10 +38,10 @@ simulation:
   force_f2: 0
 
   # For pressure difference boundary conditions
-  pressure_bc: True
-  minimum_radius: 3 # Correlated to delta rho in docs. This acts as entry pressure, so set 1-3 voxels lower than inscribed sphere radius
-  num_pressure_steps: 10
   # The actual pressure difference is calculated from the minimum radius and the contact angle of the first material. Make sure that the first material is the non-wetting material.
+  pressure_bc: True
+  minimum_radius: 3 # Minimum pore radius with mat1 that will get wet. Corresponds to the highest pressure difference.
+  num_pressure_steps: 10
 
   # Initial Conditions
   fluid_init: drainage  # If drainage, traditional drainage setup used. If custom, use fluid 1/2 init to do custom fluid setup
@@ -72,9 +73,9 @@ simulation:
     G_ads_f1_s3: -0.35 # Mat_id 6 # PTFE around 140 degrees
     G_ads_f1_s4: 0
 
-  convergence: 1e-4  # Convergence threshold changed from 1e-4
+  convergence: 1e-4  # Convergence threshold (1e-4 recommended)
   convergence_iter: 500  # How often to check for convergence
-  max_iterations: 500000  # max iterations per Pc step
+  max_iterations: 500000  # max iterations per pressure step
   save_sim: True  # Save restart files
   save_iter: 500  # How often to save restart files
   gif_iter: 1000  # How often to save gifs

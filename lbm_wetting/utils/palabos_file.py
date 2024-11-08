@@ -1,4 +1,9 @@
-from pathlib import Path
+"""
+Creates the xml input file for the palabos simulation.
+
+Creator: Florian Wiesner
+Date: 2024-11-08
+"""
 
 
 class PalabosInputFile:
