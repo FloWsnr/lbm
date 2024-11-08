@@ -13,9 +13,9 @@ geometry:
 
 materials:
   # [id in the loaded file, id in the palabos input file]
-  - [255, 1] # Should be the most hydrophobic material
+  - [150, 1] # Should be the most hydrophobic material
   - [200, 4]
-  - [150, 6]
+  - [255, 6]
   - [128, 3] # This is the non-wetting fluid
 
 domain:
@@ -41,7 +41,7 @@ simulation:
   # The actual pressure difference is calculated from the minimum radius and the contact angle of the first material. Make sure that the first material is the non-wetting material.
   pressure_bc: True
   minimum_radius: 3 # Minimum pore radius with mat1 that will get wet. Corresponds to the highest pressure difference.
-  num_pressure_steps: 10
+  num_pressure_steps: 20
 
   # Initial Conditions
   fluid_init: drainage  # If drainage, traditional drainage setup used. If custom, use fluid 1/2 init to do custom fluid setup
@@ -68,9 +68,9 @@ simulation:
 
     # Wetting forces from Huang et al. 2007
     # Positive -> hydrophilic, negative -> hydrophobic
-    G_ads_f1_s1: -0.35 # Mat_id 1 # Carbon around 100 degrees
-    G_ads_f1_s2: 0.35 # Mat_id 4 # Binder around 100 degrees
-    G_ads_f1_s3: -0.35 # Mat_id 6 # PTFE around 140 degrees
+    G_ads_f1_s1: -0.35 # Mat_id 1 # PTFE around 140 degrees
+    G_ads_f1_s2: -0.05 # Mat_id 4 # Binder around 100 degrees
+    G_ads_f1_s3: -0.05 # Mat_id 6 # Carbon around 100 degrees
     G_ads_f1_s4: 0
 
   convergence: 1e-4  # Convergence threshold (1e-4 recommended)

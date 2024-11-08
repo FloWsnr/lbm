@@ -15,7 +15,7 @@
 #SBATCH --nodes=1
 
 ### Number of tasks (MPI ranks)
-#SBATCH --ntasks=4
+#SBATCH --ntasks=96
 
 ### Partition
 #SBATCH --partition=c23ms
@@ -25,13 +25,12 @@
 #SBATCH --mail-user=florian.wiesner@avt.rwth-aachen.de
 
 ### Maximum runtime per task
-##SBATCH --time=24:00:00
-#SBATCH --time=01:00:00
+#SBATCH --time=24:00:00
 
 ### create time series, i.e. 100 jobs one after another. Each runs for 24 hours
 ##SBATCH --array=1-100%1
 ### use nodes exclusively, only needed for larger simulations
-##SBATCH --exclusive
+#SBATCH --exclusive
 
 # Setup output file, if not defined by slurm, i.e. when running interactively
 if [ -z "$SLURM_OUTPUT" ]; then
@@ -47,9 +46,9 @@ module load OpenMPI/4.1.4
 # Set up paths
 palabos_dir="/home/fw641779/Coding/lattice-boltzmann-wetting/mplbm-ut-mirror/src/2-phase_LBM/ShanChen"
 config_file="/home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/twophase.yml"
-sim_dir="/hpcwork/fw641779/lbm/Test_Tubes"
-# sim_dir="/hpcwork/fw641779/lbm/Toray-120C/55cov/structure0"
-sim_name="test_run_5"
+#sim_dir="/hpcwork/fw641779/lbm/Test_Tubes"
+sim_dir="/hpcwork/fw641779/lbm/Toray-120C/55cov/structure0"
+sim_name="test_run_0"
 
 export CONDA_ROOT=$HOME/miniconda3
 # >>> conda initialize >>>
