@@ -76,21 +76,53 @@ def _dump_config(config: dict, config_path: Path):
         yaml.dump(config, f)
 
 
+def _check_prep_already_exists(sim_dir: Path, sim_name: str) -> bool:
+    """
+    Check if the preparation already exists.
+    """
+    return (sim_dir / sim_name / "input" / "2_phase_sim_input.xml").exists()
+
+
+# Defaults
+config_path = Path(
+    "/home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/twophase.yml"
+)
+sim_dir = Path("/hpcwork/fw641779/lbm/Toray-120C/55cov/structure0")
+sim_name = "test_run_0"
+
 parser = argparse.ArgumentParser()
-parser.add_argument("config", type=Path, help="Path to the configuration file")
-parser.add_argument("sim_dir", type=Path, help="Simulation directory")
-parser.add_argument("sim_name", type=str, help="Simulation name")
+parser.add_argument(
+    "config",
+    type=Path,
+    nargs="?",
+    default=config_path,
+    help="Path to the configuration file",
+)
+parser.add_argument(
+    "sim_dir",
+    type=Path,
+    nargs="?",
+    default=sim_dir,
+    help="Simulation directory",
+)
+parser.add_argument(
+    "sim_name",
+    type=str,
+    nargs="?",
+    default="test_run_0",
+    help="Simulation name (default: test_run_0)",
+)
 args = parser.parse_args()
 
 config_path = Path(args.config)
 sim_dir = Path(args.sim_dir)
 sim_name = args.sim_name
 
-print("Starting preparation of 2-phase simulation...")
-print("  config:", config_path)
-print("  sim_dir:", sim_dir)
-print("  sim_name:", sim_name)
+if _check_prep_already_exists(sim_dir, sim_name):
+    print("Preparation already exists. Palabos simulation can start now.")
+    exit(0)
 
+print("Starting preparation of 2-phase simulation...")
 config = parse_input_file(config_path)
 config = update_config(config, sim_dir, sim_name)
 prep_2_phase_sim(config)
