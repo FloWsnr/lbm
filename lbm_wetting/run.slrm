@@ -15,7 +15,7 @@
 #SBATCH --nodes=1
 
 ### Number of tasks (MPI ranks)
-#SBATCH --ntasks=96
+#SBATCH --ntasks=2
 
 ### Partition
 #SBATCH --partition=c23ms
@@ -25,18 +25,16 @@
 #SBATCH --mail-user=florian.wiesner@avt.rwth-aachen.de
 
 ### Maximum runtime per task
-#SBATCH --time=24:00:00
+##SBATCH --time=24:00:00
+#SBATCH --time=00:05:00
 
 ### create time series, i.e. 100 jobs one after another. Each runs for 24 hours
 ##SBATCH --array=1-100%1
 ### use nodes exclusively, only needed for larger simulations
-#SBATCH --exclusive
+##SBATCH --exclusive
 
-# Setup output file, if not defined by slurm, i.e. when running interactively
-if [ -z "$SLURM_OUTPUT" ]; then
-    SLURM_OUTPUT="/hpcwork/fw641779/lbm/output_logs/two-phase_lbm_TEST.out"
-fi
-
+# Get the actual SLURM output file path
+SLURM_OUTPUT="/hpcwork/fw641779/lbm/output_logs/two-phase_lbm_${SLURM_JOB_ID}.out"
 
 # Load modules
 module purge
@@ -46,8 +44,8 @@ module load OpenMPI/4.1.4
 # Set up paths
 palabos_dir="/home/fw641779/Coding/lattice-boltzmann-wetting/mplbm-ut-mirror/src/2-phase_LBM/ShanChen"
 config_file="/home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/twophase.yml"
-#sim_dir="/hpcwork/fw641779/lbm/Test_Tubes"
-sim_dir="/hpcwork/fw641779/lbm/Toray-120C/55cov/structure0"
+sim_dir="/hpcwork/fw641779/lbm/Test_Tubes"
+# sim_dir="/hpcwork/fw641779/lbm/Toray-120C/55cov/structure0"
 sim_name="test_run_0"
 
 export CONDA_ROOT=$HOME/miniconda3
@@ -80,12 +78,12 @@ echo "--------------------------------"
 conda activate lbm
 # Capture Python output and errors in a variable and run the script
 python_output=$(python /home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/2_phase_prep.py $config_file $sim_dir $sim_name 2>&1)
+# Write both the Python output/errors
+echo "$python_output" >> $SLURM_OUTPUT
 
 # Get the return code of the python script and abort if it failed
 return_code=$?
 if [ $return_code -ne 0 ]; then
-    # Write both the Python output/errors and our message to the output file
-    echo "$python_output" >> $SLURM_OUTPUT
     echo "Python script failed with code $return_code. Error messages above." >> $SLURM_OUTPUT
     exit $return_code
 else
