@@ -42,9 +42,9 @@ module load GCC/11.3.0
 module load OpenMPI/4.1.4
 
 # Set up paths
-palabos_dir="/home/fw641779/Coding/lattice-boltzmann-wetting/mplbm-ut-mirror/src/2-phase_LBM/ShanChen"
+palabos_exec="/home/fw641779/Coding/lattice-boltzmann-wetting/mplbm-ut-mirror/src/2-phase_LBM/ShanChen"
 config_file="/home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/twophase.yml"
-sim_dir="/hpcwork/fw641779/lbm/Test_Tubes"
+sim_dir="/hpcwork/fw641779/lbm/Test_Cones"
 # sim_dir="/hpcwork/fw641779/lbm/Toray-120C/55cov/structure0"
 sim_name="test_run_0"
 
@@ -93,7 +93,7 @@ else
     # Start time measurement
     start_time=$(date +%s)
 
-    $MPIEXEC $FLAGS_MPI_BATCH $palabos_dir $input_file
+    $MPIEXEC $FLAGS_MPI_BATCH $palabos_exec $input_file
 
     # Calculate and output elapsed time
     end_time=$(date +%s)
