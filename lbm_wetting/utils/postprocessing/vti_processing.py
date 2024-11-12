@@ -126,9 +126,16 @@ def process_vti_files(config: dict) -> None:
     output_folder = config["input_output"]["output_folder"]
     output_folder = Path(output_folder)
     processed_folder = output_folder.parent / "processed"
-    processed_folder.mkdir(parents=True, exist_ok=True)
 
-    assert processed_folder.exists(), "Processed folder does not exist"
+    if processed_folder.exists():
+        print(f"Processed folder already exists: {processed_folder}")
+        print("Deleting its contents and creating a new one.")
+        # Delete all files in the processed folder
+        for file in processed_folder.glob("*"):
+            file.unlink()
+
+    # create processed folder
+    processed_folder.mkdir(parents=True, exist_ok=True)
 
     # check if structure.vti exists
     structure_file = sim_dir / "structure.vti"
@@ -218,8 +225,8 @@ def parse_input_file(file: Path) -> dict:
 if __name__ == "__main__":
     import argparse
 
-    default_sim_dir = Path("/hpcwork/fw641779/lbm/Test_Cones")
-    default_sim_name = "test_run_3"
+    default_sim_dir = Path("/hpcwork/fw641779/lbm/Toray-120C/55cov/structure0")
+    default_sim_name = "test_run_0"
 
     parser = argparse.ArgumentParser(
         description="Process VTI files for LBM wetting simulation."
