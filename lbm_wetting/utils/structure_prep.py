@@ -187,7 +187,7 @@ class PalabosGeometry:
             structure,
             ((num_layers, num_layers), (0, 0), (0, 0)),
             mode="constant",
-            constant_values=(0, 0),
+            constant_values=(3, 0),
         )
         return structure
 
