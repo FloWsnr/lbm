@@ -76,10 +76,9 @@ simulation:
   convergence: 1e-4  # Convergence threshold (1e-4 recommended)
   convergence_iter: 500  # How often to check for convergence
 
-  # Max time in seconds
+  # Max total iterations
   # This allows for graceful termination of the simulation and the restarting
-  max_time: 30  # Max time in seconds
-
+  max_iter: 5000  # Max iterations
   max_iter_per_p: 100000  # Max iterations per pressure step
   save_sim: True  # Save restart files
   save_iter: 5000  # How often to save restart files

@@ -256,3 +256,5 @@ if __name__ == "__main__":
     config = parse_input_file(config_path)
 
     process_vti_files(config)
+
+    print("Processing completed.")

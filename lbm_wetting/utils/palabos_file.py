@@ -151,7 +151,7 @@ class PalabosInputFile:
     def _write_output_section(self):
         convergence = self.config["simulation"]["convergence"]
         convergence_iter = self.config["simulation"]["convergence_iter"]
-        max_time = self.config["simulation"]["max_time"]
+        max_iter = self.config["simulation"]["max_iter"]
         max_iter_per_p = self.config["simulation"]["max_iter_per_p"]
         save_sim = self.config["simulation"]["save_sim"]
         save_iter = self.config["simulation"]["save_iter"]
@@ -172,7 +172,7 @@ class PalabosInputFile:
             file.write(f"\t<save_it> {save_iter} </save_it>\n")
             file.write(f"\t<save_sim> {save_sim} </save_sim>\n")
             file.write(f"\t<convergence> {convergence} </convergence>\n")
-            file.write(f"\t<max_time> {max_time} </max_time>\n")
+            file.write(f"\t<max_iter> {max_iter} </max_iter>\n")
             file.write(f"\t<it_max_per_p> {max_iter_per_p} </it_max_per_p>\n")
 
             file.write(f"\t<it_conv> {convergence_iter} </it_conv>\n")

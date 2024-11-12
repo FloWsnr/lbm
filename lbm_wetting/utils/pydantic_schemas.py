@@ -82,7 +82,7 @@ class Simulation(BaseModel):
     fluid_data: FluidData
     convergence: float
     convergence_iter: int
-    max_time: float
+    max_iter: int
     max_iter_per_p: int
     save_sim: bool
     save_iter: int
