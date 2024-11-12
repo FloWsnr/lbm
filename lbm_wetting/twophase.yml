@@ -75,9 +75,13 @@ simulation:
 
   convergence: 1e-4  # Convergence threshold (1e-4 recommended)
   convergence_iter: 500  # How often to check for convergence
-  max_iterations: 500000  # max iterations per pressure step
+
+  # Total max iterations (choosen to be completed in 24h)
+  # This allows for graceful termination of the simulation and the restarting
+  max_iterations: 1000
+  max_iter_per_p: 100000  # Max iterations per pressure step
   save_sim: True  # Save restart files
-  save_iter: 500  # How often to save restart files
+  save_iter: 1000  # How often to save restart files
   gif_iter: 1000  # How often to save gifs
   vtk_iter: 1000  # How often to save vtk files
   rho_f2_vtk: False  # When True, saves rho f1 and f2 vtks. If False, only saves rho f1 vtk

@@ -83,6 +83,7 @@ class Simulation(BaseModel):
     convergence: float
     convergence_iter: int
     max_iterations: int
+    max_iter_per_p: int
     save_sim: bool
     save_iter: int
     gif_iter: int
