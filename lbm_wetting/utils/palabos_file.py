@@ -59,21 +59,42 @@ class PalabosInputFile:
         load_fluid_type = self.config["simulation"]["fluid_init"]
         if load_fluid_type == "geom":
             load_fluid_from_geom = True
-        else:
+        elif load_fluid_type == "custom":
+            # If custom, load the exact fluid positions from the config
             load_fluid_from_geom = False
+            fluid1_x1 = self.config["simulation"]["fluid_1_init"]["x1"]
+            fluid1_x2 = self.config["simulation"]["fluid_1_init"]["x2"]
+            fluid1_y1 = self.config["simulation"]["fluid_1_init"]["y1"]
+            fluid1_y2 = self.config["simulation"]["fluid_1_init"]["y2"]
+            fluid1_z1 = self.config["simulation"]["fluid_1_init"]["z1"]
+            fluid1_z2 = self.config["simulation"]["fluid_1_init"]["z2"]
+            fluid2_x1 = self.config["simulation"]["fluid_2_init"]["x1"]
+            fluid2_x2 = self.config["simulation"]["fluid_2_init"]["x2"]
+            fluid2_y1 = self.config["simulation"]["fluid_2_init"]["y1"]
+            fluid2_y2 = self.config["simulation"]["fluid_2_init"]["y2"]
+            fluid2_z1 = self.config["simulation"]["fluid_2_init"]["z1"]
+            fluid2_z2 = self.config["simulation"]["fluid_2_init"]["z2"]
+        elif load_fluid_type == "drainage":
+            structure = self.config["structure"]
+            nx = structure.shape[0]
+            ny = structure.shape[1]
+            nz = structure.shape[2]
 
-        fluid1_x1 = self.config["simulation"]["fluid_1_init"]["x1"]
-        fluid1_x2 = self.config["simulation"]["fluid_1_init"]["x2"]
-        fluid1_y1 = self.config["simulation"]["fluid_1_init"]["y1"]
-        fluid1_y2 = self.config["simulation"]["fluid_1_init"]["y2"]
-        fluid1_z1 = self.config["simulation"]["fluid_1_init"]["z1"]
-        fluid1_z2 = self.config["simulation"]["fluid_1_init"]["z2"]
-        fluid2_x1 = self.config["simulation"]["fluid_2_init"]["x1"]
-        fluid2_x2 = self.config["simulation"]["fluid_2_init"]["x2"]
-        fluid2_y1 = self.config["simulation"]["fluid_2_init"]["y1"]
-        fluid2_y2 = self.config["simulation"]["fluid_2_init"]["y2"]
-        fluid2_z1 = self.config["simulation"]["fluid_2_init"]["z1"]
-        fluid2_z2 = self.config["simulation"]["fluid_2_init"]["z2"]
+            # If drainage, use the full faces for fluid 1 and 2
+            load_fluid_from_geom = False
+            fluid1_x1 = 1
+            fluid1_x2 = 2
+            fluid1_y1 = 1
+            fluid1_y2 = ny
+            fluid1_z1 = 1
+            fluid1_z2 = nz
+
+            fluid2_x1 = 3
+            fluid2_x2 = nx
+            fluid2_y1 = 1
+            fluid2_y2 = ny
+            fluid2_z1 = 1
+            fluid2_z2 = nz
 
         with open(self.file, "a") as file:
             # Write initial position of fluids
