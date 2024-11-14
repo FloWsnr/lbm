@@ -23,7 +23,7 @@ domain:
     x: False
     y: True
     z: True
-  inlet_outlet_layers: 4  # 3-4 recommended for 2-phase sim. Number of empty layers at the inlet and outlet
+  inlet_outlet_layers: 6  # 3-4 recommended for 2-phase sim. Number of empty layers at the inlet and outlet
 
 simulation:
   restart_sim: True # Set to true if you would like to continue from a previous saved state. Otherwise, palabos will start from scratch.
@@ -44,8 +44,8 @@ simulation:
   num_pressure_steps: 20
 
   # Initial Conditions
-  fluid_init: drainage  # If drainage, traditional drainage setup used. If custom, use fluid 1/2 init to do custom fluid setup
-  # CURRENTLY NOT USED
+  fluid_init: drainage  # If drainage, traditional drainage setup used: fluid 1 at x=0 and structure filled with fluid 2.
+  #If custom, use fluid 1/2 init to do custom fluid setup (currently not used)
   fluid_1_init:
     x1: 0
     x2: 0
@@ -78,12 +78,12 @@ simulation:
 
   # Max total iterations
   # This allows for graceful termination of the simulation and the restarting
-  max_iter: 1000  # Max iterations
+  max_iter: 10000  # Max iterations
   max_iter_per_p: 50000  # Max iterations per pressure step
   save_sim: True  # Save restart files
   save_iter: 5000  # How often to save restart files
-  gif_iter: 10000  # How often to save gifs
-  vtk_iter: 1  # How often to save vtk files
+  gif_iter: 10000000  # How often to save gifs
+  vtk_iter: 1000  # How often to save vtk files
   rho_f2_vtk: False  # When True, saves rho f1 and f2 vtks. If False, only saves rho f1 vtk
   print_geom: True  # Create vtk of geometry at beginning
   print_stl: False  # Create stl of geometry at beginning

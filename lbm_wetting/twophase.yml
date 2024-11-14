@@ -44,8 +44,8 @@ simulation:
   num_pressure_steps: 20
 
   # Initial Conditions
-  fluid_init: drainage  # If drainage, traditional drainage setup used. If custom, use fluid 1/2 init to do custom fluid setup
-  # CURRENTLY NOT USED
+  fluid_init: drainage  # If drainage, traditional drainage setup used: fluid 1 at x=0 and structure filled with fluid 2.
+  #If custom, use fluid 1/2 init to do custom fluid setup (currently not used)
   fluid_1_init:
     x1: 0
     x2: 0
@@ -73,13 +73,13 @@ simulation:
     G_ads_f1_s3: -0.05 # Mat_id 6 # Carbon around 100 degrees
     G_ads_f1_s4: 0
 
-  convergence: 1e-4  # Convergence threshold (1e-4 recommended)
+  convergence: 2e-4  # Convergence threshold (1e-4 recommended)
   convergence_iter: 500  # How often to check for convergence
 
   # Max total iterations
   # This allows for graceful termination of the simulation and the restarting
   max_iter: 30000  # Max iterations
-  max_iter_per_p: 100000  # Max iterations per pressure step
+  max_iter_per_p: 50000  # Max iterations per pressure step
   save_sim: True  # Save restart files
   save_iter: 5000  # How often to save restart files
   gif_iter: 1000  # How often to save gifs
