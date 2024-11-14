@@ -172,16 +172,23 @@ def process_vti_files(config: dict) -> None:
     video_writer = VideoWriter(processed_folder / "video.gif", fps=5, upsample_rate=2)
 
     for i, file in enumerate(states):
+        ref_structure = np.copy(structure)
+
         density_data = read_vti_file(file)
         density = density_data["Density"]
 
-        # slice density to remove the input/output layers from the z axes
-        swap_xz = config["geometry"]["swap_xz"]
+        # Add inlet/output layers to the structure to match density shape
         num_layers = config["domain"]["inlet_outlet_layers"]
-        density = density[num_layers:-num_layers, :, :]
+        ref_structure = np.pad(
+            ref_structure,
+            ((0, 0), (0, 0), (num_layers, num_layers)),
+            mode="constant",
+            constant_values=0,
+        )
+        swap_xz = config["geometry"]["swap_xz"]
         if swap_xz:
             density = np.swapaxes(density, 0, 2)
-        wet_structure = _convert_density(density, structure)
+        wet_structure = _convert_density(density, ref_structure, num_layers)
 
         data = {"wet_structure": wet_structure}
 
@@ -204,7 +211,9 @@ def process_vti_files(config: dict) -> None:
     video_writer.close()
 
 
-def _convert_density(density: np.ndarray, structure: np.ndarray) -> np.ndarray:
+def _convert_density(
+    density: np.ndarray, structure: np.ndarray, num_layers: int
+) -> np.ndarray:
     water = density > 1
     solid = structure != 0
 
@@ -225,8 +234,8 @@ def parse_input_file(file: Path) -> dict:
 if __name__ == "__main__":
     import argparse
 
-    default_sim_dir = Path("/hpcwork/fw641779/lbm/Toray-120C/55cov/structure0")
-    default_sim_name = "test_run_0"
+    default_sim_dir = Path("/hpcwork/fw641779/lbm/Test_Cones")
+    default_sim_name = "test_run_3"
 
     parser = argparse.ArgumentParser(
         description="Process VTI files for LBM wetting simulation."
