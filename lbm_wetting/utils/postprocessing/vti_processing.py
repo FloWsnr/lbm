@@ -112,103 +112,111 @@ class VTIWriter:
         tree.write(self.pvd_file)
 
 
-def process_vti_files(config: dict) -> None:
-    """Long and ugly function to process the vti files after the simulation.
+class VTIProcessor:
+    def __init__(self, config: dict) -> None:
+        self.config = config
+        self.sim_dir = Path(config["input_output"]["simulation_directory"])
 
-    Converts the densities to a material (uint8) structure. Thus saves a lot of space.
-    Writes a small video of the simulation for immediate inspection.
-    Writes a pvd file for paraview to bundle the vti files.
+        output_folder = config["input_output"]["output_folder"]
+        self.output_folder = Path(output_folder)
+        self.processed_folder = self.output_folder.parent / "processed"
+        # create processed folder
+        self.processed_folder.mkdir(parents=True, exist_ok=True)
 
-    Writes two pvd files, one for the whole simulation and one for the steady states.
-    """
-    sim_dir = Path(config["input_output"]["simulation_directory"])
+    def _load_structure(self) -> np.ndarray:
+        structure_file = self.sim_dir / "structure.vti"
+        if not structure_file.exists():
+            file_with_suffix = structure_file.with_suffix(".npy")
+            structure = np.load(file_with_suffix)
+        else:
+            structure_data = read_vti_file(structure_file)
+            structure = structure_data["structure"]
+        return structure
 
-    output_folder = config["input_output"]["output_folder"]
-    output_folder = Path(output_folder)
-    processed_folder = output_folder.parent / "processed"
-
-    if processed_folder.exists():
-        print(f"Processed folder already exists: {processed_folder}")
-        print("Deleting its contents and creating a new one.")
-        # Delete all files in the processed folder
-        for file in processed_folder.glob("*"):
-            file.unlink()
-
-    # create processed folder
-    processed_folder.mkdir(parents=True, exist_ok=True)
-
-    # check if structure.vti exists
-    structure_file = sim_dir / "structure.vti"
-    if not structure_file.exists():
-        # try to find file with suffix .npy
-        file_with_suffix = structure_file.with_suffix(".npy")
-        if not file_with_suffix.exists():
-            raise FileNotFoundError(f"Structure file not found: {structure_file}")
-        structure_file = file_with_suffix
-        structure = np.load(structure_file)
-    else:
-        structure_data = read_vti_file(structure_file)
-        structure = structure_data["structure"]
-
-    writer = VTIWriter(processed_folder, pvd_file=processed_folder / "sim.pvd")
-    steady_state_writer = VTIWriter(
-        processed_folder, pvd_file=processed_folder / "steady_states.pvd"
-    )
-
-    states = [f for f in output_folder.glob("rho_f1_*.vti")]
-    # sort states first by number, i.e rho_f1_001_00002000.vti, 001 is the number
-    # and then by time, i.e 00002000
-    states.sort(key=lambda x: (int(x.stem.split("_")[2]), int(x.stem.split("_")[3])))
-
-    # steady states are the last state of each first component
-    # i.e the last 001, last 002, etc. Find them by checking if the next file has a different first component
-    steady_states = []
-    for i, f in enumerate(states[:-1]):
-        if states[i + 1].stem.split("_")[2] != f.stem.split("_")[2]:
-            steady_states.append(i)
-    steady_states.append(len(states) - 1)
-
-    # start video writer
-    video_writer = VideoWriter(processed_folder / "video.gif", fps=5, upsample_rate=2)
-
-    for i, file in enumerate(states):
-        ref_structure = np.copy(structure)
-
-        density_data = read_vti_file(file)
-        density = density_data["Density"]
-
-        # Add inlet/output layers to the structure to match density shape
-        num_layers = config["domain"]["inlet_outlet_layers"]
-        ref_structure = np.pad(
-            ref_structure,
-            ((0, 0), (0, 0), (num_layers, num_layers)),
-            mode="constant",
-            constant_values=0,
+    def _find_states(self) -> list[Path]:
+        states = [f for f in self.output_folder.glob("rho_f1_*.vti")]
+        # sort states first by number, i.e rho_f1_001_00002000.vti, 001 is the number
+        # and then by time, i.e 00002000
+        states.sort(
+            key=lambda x: (int(x.stem.split("_")[2]), int(x.stem.split("_")[3]))
         )
-        swap_xz = config["geometry"]["swap_xz"]
-        if swap_xz:
-            density = np.swapaxes(density, 0, 2)
-        wet_structure = _convert_density(density, ref_structure, num_layers)
+        return states
 
-        data = {"wet_structure": wet_structure}
+    def _find_steady_states(self, states: list[Path]) -> list[int]:
+        # steady states are the last state of each first component
+        # i.e the last 001, last 002, etc. Find them by checking if the next file has a different first component
+        steady_states = []
+        for i, f in enumerate(states[:-1]):
+            if states[i + 1].stem.split("_")[2] != f.stem.split("_")[2]:
+                steady_states.append(i)
+        steady_states.append(len(states) - 1)
+        return steady_states
 
-        comp1 = file.stem.split("_")[2]
-        comp2 = file.stem.split("_")[3]
-        file_name = "sim_" + comp1 + "_" + comp2 + ".vti"
-        time_step = float(comp1 + "." + comp2)
-        writer.write_vti(data, file_name, time_step)
+    def process_vti_files(self) -> None:
+        self.structure = self._load_structure()
 
-        if i in steady_states:
-            steady_state_writer.write_pvd(file_name, time_step)
+        self.writer = VTIWriter(
+            self.processed_folder, pvd_file=self.processed_folder / "sim.pvd"
+        )
 
-        # write video
-        slice_index = int(wet_structure.shape[0] / 2)
-        wet_structure_slice = wet_structure[slice_index, :, :]
-        video_writer.write(wet_structure_slice)
+        self.steady_state_writer = VTIWriter(
+            self.processed_folder, pvd_file=self.processed_folder / "steady_states.pvd"
+        )
 
-    writer.close()
-    steady_state_writer.close()
-    video_writer.close()
+        self.states = self._find_states()
+        self.steady_states = self._find_steady_states(self.states)
+
+        for i, file in enumerate(self.states):
+            comp1 = file.stem.split("_")[2]
+            comp2 = file.stem.split("_")[3]
+            file_name = "sim_" + comp1 + "_" + comp2 + ".vti"
+            time_step = float(comp1 + "." + comp2)
+            # check if file is already processed
+            if (self.processed_folder / file_name).exists():
+                print(f"File already processed: {file}")
+                self.writer.write_pvd(file_name, time_step)
+                continue
+            print(f"Processing file: {file}")
+
+            ref_structure = np.copy(self.structure)
+            # Add inlet/output layers to the structure to match density shape
+            num_layers = config["domain"]["inlet_outlet_layers"]
+            ref_structure = np.pad(
+                ref_structure,
+                ((0, 0), (0, 0), (num_layers, num_layers)),
+                mode="constant",
+                constant_values=0,
+            )
+
+            density_data = read_vti_file(file)
+            density = density_data["Density"]
+            swap_xz = config["geometry"]["swap_xz"]
+            if swap_xz:
+                density = np.swapaxes(density, 0, 2)
+            wet_structure = _convert_density(density, ref_structure, num_layers)
+
+            data = {"wet_structure": wet_structure}
+            self.writer.write_vti(data, file_name, time_step)
+
+            if i in self.steady_states:
+                self.steady_state_writer.write_pvd(file_name, time_step)
+
+        self.writer.close()
+        self.steady_state_writer.close()
+
+    def write_video(self) -> None:
+        video_writer = VideoWriter(
+            self.processed_folder / "video.gif", fps=5, upsample_rate=2
+        )
+
+        for file in self.processed_folder.glob("sim_*.vti"):
+            data = read_vti_file(file)
+            wet_structure = data["wet_structure"]
+            slice_index = int(wet_structure.shape[0] / 2)
+            wet_structure_slice = wet_structure[slice_index, :, :]
+            video_writer.write(wet_structure_slice)
+
+        video_writer.close()
 
 
 def _convert_density(
@@ -234,8 +242,8 @@ def parse_input_file(file: Path) -> dict:
 if __name__ == "__main__":
     import argparse
 
-    default_sim_dir = Path("/hpcwork/fw641779/lbm/Test_Cones")
-    default_sim_name = "test_run_3"
+    default_sim_dir = Path("/hpcwork/fw641779/lbm/Toray-120C/55cov/structure0")
+    default_sim_name = "test_run_2"
 
     parser = argparse.ArgumentParser(
         description="Process VTI files for LBM wetting simulation."
@@ -264,6 +272,7 @@ if __name__ == "__main__":
     config_path = sim_dir / sim_name / "input" / "config.yml"
     config = parse_input_file(config_path)
 
-    process_vti_files(config)
-
+    processor = VTIProcessor(config)
+    processor.process_vti_files()
+    processor.write_video()
     print("Processing completed.")
