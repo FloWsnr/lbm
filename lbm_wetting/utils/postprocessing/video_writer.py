@@ -23,8 +23,6 @@ class VideoWriter:
         self.upsample_rate = upsample_rate
 
         file = Path(file)
-        if file.exists():
-            raise FileExistsError(f"File {file} already exists")
         file.parent.mkdir(parents=True, exist_ok=True)
 
         if self.format == ".mp4":

@@ -209,7 +209,13 @@ class VTIProcessor:
             self.processed_folder / "video.gif", fps=5, upsample_rate=2
         )
 
-        for file in self.processed_folder.glob("sim_*.vti"):
+        states = [f for f in self.processed_folder.glob("sim_*.vti")]
+        # sort states first by number, i.e sim_001_00002000.vti, 001 is the number
+        # and then by time, i.e 00002000
+        states.sort(
+            key=lambda x: (int(x.stem.split("_")[1]), int(x.stem.split("_")[2]))
+        )
+        for file in states:
             data = read_vti_file(file)
             wet_structure = data["wet_structure"]
             slice_index = int(wet_structure.shape[0] / 2)
