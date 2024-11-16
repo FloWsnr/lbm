@@ -26,12 +26,11 @@
 
 ### Maximum runtime per task
 #SBATCH --time=24:00:00
-##SBATCH --time=00:10:00
 
 ### create time series, i.e. 100 jobs one after another. Each runs for 24 hours
 ##SBATCH --array=1-100%1
 ### use nodes exclusively, only needed for larger simulations
-##SBATCH --exclusive
+#SBATCH --exclusive
 
 # Get the actual SLURM output file path
 SLURM_OUTPUT="/hpcwork/fw641779/lbm/output_logs/two-phase_lbm_${SLURM_JOB_ID}.out"
@@ -46,7 +45,7 @@ palabos_exec="/home/fw641779/Coding/lattice-boltzmann-wetting/mplbm-ut-mirror/sr
 config_file="/home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/twophase.yml"
 # sim_dir="/hpcwork/fw641779/lbm/Test_Cones"
 sim_dir="/hpcwork/fw641779/lbm/Toray-120C/55cov/structure0"
-sim_name="test_run_1"
+sim_name="test_run_2"
 
 export CONDA_ROOT=$HOME/miniconda3
 # >>> conda initialize >>>
