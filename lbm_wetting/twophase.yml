@@ -78,8 +78,8 @@ simulation:
 
   # Max total iterations
   # This allows for graceful termination of the simulation and the restarting
-  max_iter: 85000  # Max iterations
-  max_iter_per_p: 50000  # Max iterations per pressure step
+  max_iter: 80000  # Max iterations
+  max_iter_per_p: 40000  # Max iterations per pressure step
   save_sim: True  # Save restart files
   save_iter: 10000  # How often to save restart files
   gif_iter: 1000  # How often to save gifs

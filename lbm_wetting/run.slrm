@@ -25,10 +25,10 @@
 #SBATCH --mail-user=florian.wiesner@avt.rwth-aachen.de
 
 ### Maximum runtime per task
-#SBATCH --time=24:00:00
+#SBATCH --time=1-00:00:00
 
 ### create time series, i.e. 100 jobs one after another. Each runs for 24 hours
-##SBATCH --array=1-100%1
+#SBATCH --array=1-10%1
 ### use nodes exclusively, only needed for larger simulations
 #SBATCH --exclusive
 
@@ -47,20 +47,24 @@ config_file="/home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/twophas
 sim_dir="/hpcwork/fw641779/lbm/Toray-120C/55cov/structure0"
 sim_name="test_run_2"
 
-export CONDA_ROOT=$HOME/miniconda3
+export CONDA_ROOT=$HOME/miniforge3
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('$CONDA_ROOT/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+__conda_setup="$('/home/fw641779/miniforge3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
-    if [ -f "$CONDA_ROOT/etc/profile.d/conda.sh" ]; then
-        . "$CONDA_ROOT/etc/profile.d/conda.sh"
+    if [ -f "/home/fw641779/miniforge3/etc/profile.d/conda.sh" ]; then
+        . "/home/fw641779/miniforge3/etc/profile.d/conda.sh"
     else
-        export PATH="$CONDA_ROOT/bin:$PATH"
+        export PATH="/home/fw641779/miniforge3/bin:$PATH"
     fi
 fi
 unset __conda_setup
+
+if [ -f "/home/fw641779/miniforge3/etc/profile.d/mamba.sh" ]; then
+    . "/home/fw641779/miniforge3/etc/profile.d/mamba.sh"
+fi
 # <<< conda initialize <<<
 
 #####################################################################################
@@ -74,7 +78,7 @@ echo "sim_name: $sim_name"
 echo "--------------------------------"
 
 # Activate environment (will work whether conda was just initialized or was already available)
-conda activate lbm
+mamba activate lbm
 # Capture Python output and errors in a variable and run the script
 python_output=$(python /home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/2_phase_prep.py $config_file $sim_dir $sim_name 2>&1)
 # Write both the Python output/errors

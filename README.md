@@ -30,19 +30,27 @@ chmod +x install.sh
 ```
 
 To use the python code, you need to create a python virtual environment.
-Download miniconda and install it.
+Download miniforge and install it.
 
 Create a new environment using
 
 ```
-conda create -n lbm
-conda activate lbm
-conda install ipykernel
-conda install pydantic -c conda-forge
-conda install scipy
-conda install pyyaml
-conda install pyvista
+mamba create -n lbm
+mamba activate lbm
+mamba install ipykernel
+mamba install pydantic -c conda-forge
+mamba install scipy
+mamba install pyyaml
+mamba install pyvista
+mamba install imageio
 ```
+Afterwards, make sure you are in the root directory of the repository and install the local package using
+
+```
+pip install -e .
+```
+
+
 If you use another env name, make sure to change it in the `run.slrm` script.
 
 

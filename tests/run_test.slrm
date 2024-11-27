@@ -21,14 +21,11 @@
 #SBATCH --partition=c23ms
 
 ### Mail notification configuration
-#SBATCH --mail-type=NONE
+#SBATCH --mail-type=END
 #SBATCH --mail-user=florian.wiesner@avt.rwth-aachen.de
 
 ### Maximum runtime per task
 #SBATCH --time=00:10:00
-
-### create time series, i.e. 100 jobs one after another. Each runs for 24 hours
-##SBATCH --array=1-100%1
 
 # Get the actual SLURM output file path
 SLURM_OUTPUT="/hpcwork/fw641779/lbm/output_logs/two-phase_lbm_${SLURM_JOB_ID}.out"
@@ -42,22 +39,26 @@ module load OpenMPI/4.1.4
 palabos_exec="/home/fw641779/Coding/lattice-boltzmann-wetting/mplbm-ut-mirror/src/2-phase_LBM/ShanChen"
 config_file="/home/fw641779/Coding/lattice-boltzmann-wetting/tests/twophase_test.yml"
 sim_dir="/hpcwork/fw641779/lbm/Test_Cones"
-sim_name="test_run_4"
+sim_name="test_run_5"
 
-export CONDA_ROOT=$HOME/miniconda3
+export CONDA_ROOT=$HOME/miniforge3
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('$CONDA_ROOT/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+__conda_setup="$('/home/fw641779/miniforge3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
-    if [ -f "$CONDA_ROOT/etc/profile.d/conda.sh" ]; then
-        . "$CONDA_ROOT/etc/profile.d/conda.sh"
+    if [ -f "/home/fw641779/miniforge3/etc/profile.d/conda.sh" ]; then
+        . "/home/fw641779/miniforge3/etc/profile.d/conda.sh"
     else
-        export PATH="$CONDA_ROOT/bin:$PATH"
+        export PATH="/home/fw641779/miniforge3/bin:$PATH"
     fi
 fi
 unset __conda_setup
+
+if [ -f "/home/fw641779/miniforge3/etc/profile.d/mamba.sh" ]; then
+    . "/home/fw641779/miniforge3/etc/profile.d/mamba.sh"
+fi
 # <<< conda initialize <<<
 
 #####################################################################################
@@ -71,7 +72,7 @@ echo "sim_name: $sim_name"
 echo "--------------------------------"
 
 # Activate environment (will work whether conda was just initialized or was already available)
-conda activate lbm
+mamba activate lbm
 # Capture Python output and errors in a variable and run the script
 python_output=$(python /home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/2_phase_prep.py $config_file $sim_dir $sim_name 2>&1)
 # Write both the Python output/errors
