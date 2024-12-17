@@ -83,11 +83,23 @@ class VTIWriter:
     def _add_data(self, data: np.ndarray, name: str = "value") -> None:
         if data.ndim == 2:
             data = np.expand_dims(data, axis=2)
-        shape = np.array(data.shape) + 1
+            shape = np.array(data.shape) + 1
+        elif data.ndim == 3:
+            shape = np.array(data.shape) + 1
+        elif data.ndim == 4:
+            shape = np.array(data.shape[:3]) + 1
+        else:
+            raise ValueError(f"Data has {data.ndim} dimensions, expected 2, 3 or 4")
         self.grid.dimensions = shape
         self.grid.origin = (0, 0, 0)
         self.grid.spacing = (1, 1, 1)
-        self.grid.cell_data[name] = data.flatten(order="F")
+
+        if data.ndim == 2 or data.ndim == 3:
+            self.grid.cell_data[name] = data.flatten(order="F")
+        elif data.ndim == 4:
+            self.grid.cell_data[name + "_x"] = data[:, :, :, 0].flatten(order="F")
+            self.grid.cell_data[name + "_y"] = data[:, :, :, 1].flatten(order="F")
+            self.grid.cell_data[name + "_z"] = data[:, :, :, 2].flatten(order="F")
 
     def write_pvd(self, file_name: str, timestep: int = 0) -> None:
         """Add a file to the pvd collection without writing a vti file"""
@@ -153,7 +165,7 @@ class VTIProcessor:
         return steady_states
 
     def _find_velocity_files(self) -> list[Path]:
-        velocity_files = [f for f in self.output_folder.glob("vel_f1_*.data")]
+        velocity_files = [f for f in self.output_folder.glob("vel_f1_*.dat")]
         velocity_files.sort(key=lambda x: (int(x.stem.split("_")[2])))
         return velocity_files
 
@@ -233,11 +245,11 @@ class VTIProcessor:
             data = np.loadtxt(file)
             # data = data.astype(np.float32)
             if self.config["geometry"]["swap_xz"]:
-                x, y, z = self.structure.shape
+                x, y, z = ref_structure.shape
                 data = data.reshape(z, y, x, 3)
                 data = np.swapaxes(data, 0, 2)
             else:
-                x, y, z = self.structure.shape
+                x, y, z = ref_structure.shape
                 data = data.reshape(x, y, z, 3)
 
             data = {"velocity": data}
