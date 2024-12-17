@@ -152,6 +152,11 @@ class VTIProcessor:
         steady_states.append(len(states) - 1)
         return steady_states
 
+    def _find_velocity_files(self) -> list[Path]:
+        velocity_files = [f for f in self.output_folder.glob("vel_f1_*.data")]
+        velocity_files.sort(key=lambda x: (int(x.stem.split("_")[2])))
+        return velocity_files
+
     def process_vti_files(self) -> None:
         self.structure = self._load_structure()
 
@@ -166,17 +171,17 @@ class VTIProcessor:
         self.states = self._find_states()
         self.steady_states = self._find_steady_states(self.states)
 
-        for i, file in enumerate(self.states):
-            comp1 = file.stem.split("_")[2]
-            comp2 = file.stem.split("_")[3]
+        for i, density_file in enumerate(self.states):
+            comp1 = density_file.stem.split("_")[2]
+            comp2 = density_file.stem.split("_")[3]
             file_name = "sim_" + comp1 + "_" + comp2 + ".vti"
             time_step = float(comp1 + "." + comp2)
             # check if file is already processed
             if (self.processed_folder / file_name).exists():
-                print(f"File already processed: {file}")
+                print(f"File already processed: {density_file}")
                 self.writer.write_pvd(file_name, time_step)
                 continue
-            print(f"Processing file: {file}")
+            print(f"Processing file: {density_file}")
 
             ref_structure = np.copy(self.structure)
             # Add inlet/output layers to the structure to match density shape
@@ -188,7 +193,7 @@ class VTIProcessor:
                 constant_values=0,
             )
 
-            density_data = read_vti_file(file)
+            density_data = read_vti_file(density_file)
             density = density_data["Density"]
             swap_xz = config["geometry"]["swap_xz"]
             if swap_xz:
@@ -201,8 +206,46 @@ class VTIProcessor:
             if i in self.steady_states:
                 self.steady_state_writer.write_pvd(file_name, time_step)
 
+            # Delete the original density file
+            density_file.unlink()
+
         self.writer.close()
         self.steady_state_writer.close()
+
+    def process_velocity_files(self) -> None:
+        self.velocity_writer = VTIWriter(
+            self.processed_folder, pvd_file=self.processed_folder / "velocity.pvd"
+        )
+
+        self.structure = self._load_structure()
+        ref_structure = np.copy(self.structure)
+        # Add inlet/output layers to the structure to match density shape
+        num_layers = config["domain"]["inlet_outlet_layers"]
+        ref_structure = np.pad(
+            ref_structure,
+            ((0, 0), (0, 0), (num_layers, num_layers)),
+            mode="constant",
+            constant_values=0,
+        )
+        velocity_files = self._find_velocity_files()
+        for file in velocity_files:
+            print(f"Processing velocity file: {file}")
+            data = np.loadtxt(file)
+            # data = data.astype(np.float32)
+            if self.config["geometry"]["swap_xz"]:
+                x, y, z = self.structure.shape
+                data = data.reshape(z, y, x, 3)
+                data = np.swapaxes(data, 0, 2)
+            else:
+                x, y, z = self.structure.shape
+                data = data.reshape(x, y, z, 3)
+
+            data = {"velocity": data}
+            timestep = int(file.stem.split("_")[2])
+            self.velocity_writer.write_vti(data, file.stem + ".vti", timestep)
+
+        # save the data
+        self.velocity_writer.close()
 
     def write_video(self) -> None:
         video_writer = VideoWriter(
@@ -248,8 +291,8 @@ def parse_input_file(file: Path) -> dict:
 if __name__ == "__main__":
     import argparse
 
-    default_sim_dir = Path("/hpcwork/fw641779/lbm/Toray-120C/55cov/structure0")
-    default_sim_name = "test_run_2"
+    default_sim_dir = Path("/hpcwork/fw641779/lbm/Test_Cones")
+    default_sim_name = "test_run_1"
 
     parser = argparse.ArgumentParser(
         description="Process VTI files for LBM wetting simulation."
@@ -280,5 +323,6 @@ if __name__ == "__main__":
 
     processor = VTIProcessor(config)
     processor.process_vti_files()
+    processor.process_velocity_files()
     processor.write_video()
     print("Processing completed.")
