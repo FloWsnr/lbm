@@ -11,7 +11,7 @@ import yaml
 import argparse
 
 import lbm_wetting.utils.structure_prep as prep
-from lbm_wetting.utils.palabos_file import PalabosInputFile
+from lbm_wetting.utils.palabos_file_2phase import PalabosInputFile2Phase
 import lbm_wetting.utils.pydantic_schemas as schemas
 
 
@@ -53,7 +53,7 @@ def prep_2_phase_sim(config: dict):
 
     # 2) Create simulation input file
     print("  Creating input file...")
-    palabos_file = PalabosInputFile(config)
+    palabos_file = PalabosInputFile2Phase(config)
     palabos_file.create_input_file()
 
     # Save config in input folder

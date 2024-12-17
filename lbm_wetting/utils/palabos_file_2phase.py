@@ -6,7 +6,7 @@ Date: 2024-11-08
 """
 
 
-class PalabosInputFile:
+class PalabosInputFile2Phase:
     def __init__(self, config):
         self.config = config
         self.file = (
