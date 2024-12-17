@@ -164,7 +164,7 @@ class PalabosGeometry:
         return structure
 
     def _add_inlet_outlet_layers(
-        self, structure: np.ndarray, num_layers: int
+        self, structure: np.ndarray, num_layers: int, single_phase: bool = False
     ) -> np.ndarray:
         """
         Adds inlet and outlet layers to a structure
@@ -182,13 +182,20 @@ class PalabosGeometry:
             The structure array with inlet and outlet layers added
 
         """
-
-        structure = np.pad(
-            structure,
-            ((num_layers, num_layers), (0, 0), (0, 0)),
-            mode="constant",
-            constant_values=(3, 0),
-        )
+        if single_phase:
+            structure = np.pad(
+                structure,
+                ((num_layers, num_layers), (0, 0), (0, 0)),
+                mode="constant",
+                constant_values=(0, 0),
+            )
+        else:
+            structure = np.pad(
+                structure,
+                ((num_layers, num_layers), (0, 0), (0, 0)),
+                mode="constant",
+                constant_values=(3, 0),
+            )
         return structure
 
     def convert_material_ids(self):
@@ -205,7 +212,7 @@ class PalabosGeometry:
             new_id = material[1]
             self.structure[self.structure == old_id] = new_id
 
-    def create_geom_for_palabos(self):
+    def create_geom_for_palabos(self, single_phase: bool = False):
         # Create a mask for the non-wetting fluid
         nw_fluid_mask = self._extract_nw_fluid(self.structure)
         # Remove the non-wetting fluid from the structure
@@ -224,7 +231,9 @@ class PalabosGeometry:
 
         # Add inlet and outlet layers
         num_layers = self.inout_layers
-        self.structure = self._add_inlet_outlet_layers(self.structure, num_layers)
+        self.structure = self._add_inlet_outlet_layers(
+            self.structure, num_layers, single_phase
+        )
 
         self.input_dir.mkdir(parents=True, exist_ok=True)
         self.output_dir.mkdir(parents=True, exist_ok=True)
