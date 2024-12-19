@@ -15,22 +15,17 @@
 #SBATCH --nodes=1
 
 ### Number of tasks (MPI ranks)
-#SBATCH --ntasks=96
+#SBATCH --ntasks=2
 
 ### Partition
 #SBATCH --partition=c23ms
 
 ### Mail notification configuration
-#SBATCH --mail-type=ALL
+#SBATCH --mail-type=FAIL
 #SBATCH --mail-user=florian.wiesner@avt.rwth-aachen.de
 
 ### Maximum runtime per task
-#SBATCH --time=1-00:00:00
-
-### create time series, i.e. 100 jobs one after another. Each runs for 24 hours
-#SBATCH --array=1-10%1
-### use nodes exclusively, only needed for larger simulations
-#SBATCH --exclusive
+#SBATCH --time=00:10:00
 
 # Get the actual SLURM output file path
 SLURM_OUTPUT="/hpcwork/fw641779/lbm/output_logs/single-phase_lbm_${SLURM_JOB_ID}.out"
@@ -42,10 +37,9 @@ module load OpenMPI/4.1.4
 
 # Set up paths
 palabos_exec="/home/fw641779/Coding/lattice-boltzmann-wetting/mplbm-ut-mirror/src/1-phase_LBM/permeability"
-config_file="/home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/singlephase.yml"
-# sim_dir="/hpcwork/fw641779/lbm/Test_Cones"
-sim_dir="/hpcwork/fw641779/lbm/Toray-120C/100cov/structure0"
-sim_name="sim_run_0"
+config_file="/home/fw641779/Coding/lattice-boltzmann-wetting/tests/singlephase_test.yml"
+sim_dir="/hpcwork/fw641779/lbm/Test_Cones"
+sim_name="test_run_7"
 
 export CONDA_ROOT=$HOME/miniforge3
 # >>> conda initialize >>>
@@ -68,10 +62,10 @@ fi
 # <<< conda initialize <<<
 
 #####################################################################################
-############################# 2-phase prep ##########################################
+############################# 1-phase prep ##########################################
 #####################################################################################
 echo "--------------------------------"
-echo "Starting 2-phase prep..."
+echo "Starting 1-phase prep..."
 echo "config_file: $config_file"
 echo "sim_dir: $sim_dir"
 echo "sim_name: $sim_name"
@@ -91,7 +85,7 @@ if [ $return_code -ne 0 ]; then
     exit $return_code
 else
     # Else continue with running the simulation
-    input_file=$sim_dir/$sim_name/input/2_phase_sim_input.xml
+    input_file=$sim_dir/$sim_name/input/1_phase_sim_input.xml
 
     # Start time measurement
     start_time=$(date +%s)
@@ -110,4 +104,4 @@ fi
 python /home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/utils/postprocessing/vti_processing.py $sim_dir $sim_name
 
 ## Append the output file to the simulation directory log
-cat /hpcwork/fw641779/lbm/output_logs/two-phase_lbm_$SLURM_JOB_ID.out >> $sim_dir/$sim_name/output/log.out
+cat /hpcwork/fw641779/lbm/output_logs/single-phase_lbm_$SLURM_JOB_ID.out >> $sim_dir/$sim_name/output/log.out
