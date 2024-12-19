@@ -45,10 +45,7 @@ class PalabosInputFile1Phase:
             # Periodicity
             file.write("\t<per>\n")
             file.write(
-                f"\t\t<fluid1> <x> {periodic_x} </x> <y> {periodic_y} </y> <z> {periodic_z} </z> </fluid1>\n"
-            )
-            file.write(
-                f"\t\t<fluid2> <x> {periodic_x} </x> <y> {periodic_y} </y> <z> {periodic_z} </z> </fluid2>\n"
+                f"\t <x> {periodic_x} </x> <y> {periodic_y} </y> <z> {periodic_z} </z>\n"
             )
             file.write("\t</per>\n")
             file.write("</geometry>\n\n")
@@ -70,13 +67,13 @@ class PalabosInputFile1Phase:
 
             file.write("</folder>")
 
-            file.write("</simulations>\n")
+            file.write("<simulations>\n")
             file.write(f"\t<press> {pressure} </press>\n")
             file.write("\t<num> 1 </num>\n")
             file.write(f"\t<iter> {max_iter} </iter>\n")
             file.write(f"\t<conv> {convergence} </conv>\n")
             file.write("\t<vtk_out> True </vtk_out>\n")
-            file.write("</simulations>")
+            file.write("</simulations>\n")
 
     def create_input_file(self):
         self._write_geometry_section()
