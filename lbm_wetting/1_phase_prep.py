@@ -85,7 +85,7 @@ def _check_prep_already_exists(sim_dir: Path, sim_name: str) -> bool:
 config_path = Path(
     "/home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/singlephase.yml"
 )
-sim_dir = Path("/hpcwork/fw641779/lbm/Toray-120C/55cov/structure0")
+sim_dir = Path("/hpcwork/fw641779/lbm/Test_Cones")
 sim_name = "test_run_0"
 
 parser = argparse.ArgumentParser()

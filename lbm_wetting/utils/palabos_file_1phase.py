@@ -31,13 +31,13 @@ class PalabosInputFile1Phase:
         geo_file_name = self.config["input_output"]["file_name"]
         # Remove suffix
         geo_file_name = geo_file_name.split(".")[0]
-        geo_file = self.config["input_output"]["input_folder"] / f"{geo_file_name}.dat"
+        # geo_file = self.config["input_output"]["input_folder"] / f"{geo_file_name}.dat"
 
         with open(self.file, "a") as file:
             # Write geometry section
             file.write("<geometry>\n")
             # Geometry name
-            file.write(f"\t<file_geom> {geo_file} </file_geom>\n")
+            file.write(f"\t<file_geom> {geo_file_name} </file_geom>\n")
             # Geometry size
             file.write(
                 f"\t<size> <x> {domain_size[0]} </x> <y> {domain_size[1]} </y> <z> {domain_size[2]} </z> </size>\n"
