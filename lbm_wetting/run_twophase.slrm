@@ -109,5 +109,8 @@ fi
 # # Process VTI files
 python /home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/utils/postprocessing/vti_processing.py $sim_dir $sim_name
 
+# Calculate saturation
+python /home/fw641779/Coding/lattice-boltzmann-wetting/lbm_wetting/utils/postprocessing/post_calc.py -s $sim_dir -n $sim_name
+
 ## Append the output file to the simulation directory log
 cat /hpcwork/fw641779/lbm/output_logs/two-phase_lbm_$SLURM_JOB_ID.out >> $sim_dir/$sim_name/output/log.out

@@ -39,7 +39,7 @@ module load OpenMPI/4.1.4
 palabos_exec="/home/fw641779/Coding/lattice-boltzmann-wetting/mplbm-ut-mirror/src/1-phase_LBM/permeability"
 config_file="/home/fw641779/Coding/lattice-boltzmann-wetting/tests/singlephase_test.yml"
 sim_dir="/hpcwork/fw641779/lbm/Test_Cones"
-sim_name="test_run_8"
+sim_name="test_run_0"
 
 export CONDA_ROOT=$HOME/miniforge3
 # >>> conda initialize >>>
