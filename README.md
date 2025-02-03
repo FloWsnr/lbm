@@ -37,12 +37,7 @@ Create a new environment using
 ```
 mamba create -n lbm
 mamba activate lbm
-mamba install ipykernel
-mamba install pydantic -c conda-forge
-mamba install scipy
-mamba install pyyaml
-mamba install pyvista
-mamba install imageio
+mamba install pydantic ipykernel scipy pyyaml pyvista imageio pandas
 ```
 Afterwards, make sure you are in the root directory of the repository and install the local package using
 
