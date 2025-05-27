@@ -4,14 +4,13 @@ Wetting of GDEs and other porous media using the Lattice Boltzmann method.
 For the LB method, we use the [Palabos](https://gitlab.com/unigespc/palabos) library.
 
 Additionally, we use [MPLBM-UT by Javier E. Santos](https://github.com/je-santos/MPLBM-UT) to run the simulations.
-Palabos and MPLBM-UT are included as submodules in this repository.
 
 ## Installation
 
 Clone the repository using
 
 ```
-git clone git@git.rwth-aachen.de:avt.cvt/private/fluid_dynamics_models/lattice-boltzmann-method/lattice-boltzmann-wetting.git --recurse-submodules
+git clone git@github.com:FloWsnr/lbm.git
 ```
 
 Compile the Palabos and MPLBM-UT libraries using the install.sh script in the root directory of the repository.
