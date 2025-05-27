@@ -32,5 +32,10 @@ build/
 *.~*
 *~
 
-mplbm-ut-mirror/src/2-phase_LBM/build
-mplbm-ut-mirror/src/1-phase_LBM/build
+palabos_sim/src/2-phase_LBM/build
+palabos_sim/src/1-phase_LBM/build
+
+palabos_sim/src/2-phase_LBM/ShanChen
+palabos_sim/src/1-phase_LBM/permeability
+
+palabos_sim/src/palabos-v2.2.1
