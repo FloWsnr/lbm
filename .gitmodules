@@ -1,3 +1,0 @@
-[submodule "mplbm-ut-mirror"]
-	path = mplbm-ut-mirror
-	url = git@git.rwth-aachen.de:avt.cvt/private/fluid_dynamics_models/lattice-boltzmann-method/mplbm-ut-mirror.git
